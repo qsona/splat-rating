@@ -2,10 +2,42 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  Rating    Rating[]
+}
+
+model Rating {
+  id     String @id @default(cuid())
+  mu     Float
+  sigma  Float
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  rule   String
+
+  @@unique([userId, rule])
+}
+
+model GameResult {
+  id                 String @id @default(cuid())
+  winnerTeamsRatings Json
+  loserTeamsRatings  Json
+  beta               Float
+  metadata           Json?
+}
+
+model GameMatching {
+  id             String @id @default(cuid())
+  teamsRatingIds Json
+  metadata       Json?
 }
