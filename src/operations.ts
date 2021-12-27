@@ -5,14 +5,12 @@ import { Rating } from '@prisma/client'
 import { prisma } from './prismaClient'
 import { rate } from 'openskill'
 
-type SplatRuleSet = 'SplatZones' | 'TowerControl' | 'Rainmaker' | 'Clam Blitz'
+export type SplatRuleSet = 'SplatZones' | 'TowerControl' | 'Rainmaker' | 'ClamBlitz'
 
 const BETA = 200
 const INITIAL_SIGMA = 200
 
-export const createRating = async (userId: string, estimatedGachiPower: number) => {
-  const rule: SplatRuleSet = 'SplatZones'
-
+export const createRating = async (userId: string, rule: SplatRuleSet, estimatedGachiPower: number) => {
   const rating = await prisma.rating.create({
     data: {
       mu: estimatedGachiPower,
