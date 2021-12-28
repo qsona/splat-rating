@@ -3,7 +3,7 @@ require('dotenv').config()
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { REST } from '@discordjs/rest'
 import { Routes } from 'discord-api-types/v9'
-import { SPLAT_RULES_NAME_MAP } from './src/commands/register'
+import { SPLAT_RULES_NAME_MAP } from './src/rules'
 
 const token = process.env.DISCORD_TOKEN
 const guildId = process.env.GUILD_ID
@@ -36,22 +36,14 @@ const commands = [
         .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
         .setRequired(true)
     )
-    .addIntegerOption((option) => option.setName('gameCount').setDescription('試合数').setMinValue(1).setMaxValue(7).setRequired(true)),
+    .addIntegerOption((option) => option.setName('gamecount').setDescription('試合数').setMinValue(1).setMaxValue(7).setRequired(true)),
   new SlashCommandBuilder().setName('sr-join').setDescription('ゲームに参加する'),
   new SlashCommandBuilder().setName('sr-leave').setDescription('ゲームから抜ける'),
   new SlashCommandBuilder().setName('sr-break').setDescription('ゲームを解散する'),
   new SlashCommandBuilder()
     .setName('sr-report')
     .setDescription('結果を報告する')
-    .addStringOption((option) =>
-      option
-        .setName('result')
-        .setName('勝敗')
-        .addChoices([
-          ['win', 'win'],
-          ['lose', 'lose'],
-        ])
-    ),
+    .addBooleanOption((option) => option.setName('win').setDescription('勝った?').setRequired(true)),
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)

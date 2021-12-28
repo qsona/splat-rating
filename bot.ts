@@ -1,7 +1,12 @@
 // Require the necessary discord.js classes
 import { Client, Intents, CommandInteraction } from 'discord.js'
 
-import register from './src/commands/register'
+import registerHandler from './src/commands/register'
+import newgameHandler from './src/commands/newgame'
+import joinHandler from './src/commands/join'
+import leaveHandler from './src/commands/leave'
+import breakHandler from './src/commands/break'
+import resultHandler from './src/commands/result'
 
 require('dotenv').config()
 
@@ -35,7 +40,7 @@ const pingHandler: CommandHandler = {
   },
 }
 
-;[register, pingHandler].forEach((handler) => {
+;[registerHandler, newgameHandler, joinHandler, leaveHandler, breakHandler, resultHandler, pingHandler].forEach((handler) => {
   handlers.set(handler.commandName, handler)
 })
 
