@@ -52,6 +52,9 @@ const handler: CommandHandler = {
       await interaction.reply(messages.join('\n'))
       return
     }
+
+    messages.push('-----------------')
+    await interaction.reply(messages.join('\n'))
   },
 }
 

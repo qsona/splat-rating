@@ -3,7 +3,7 @@ import { sumBy } from 'lodash'
 import { prisma } from '../prismaClient'
 import { CommandHandler } from '../../bot'
 
-import { joinGame } from '../operations'
+import { joinRoom } from '../operations/joinRoom'
 import assert from 'assert'
 
 const handler: CommandHandler = {
@@ -12,9 +12,9 @@ const handler: CommandHandler = {
     const { channelId } = interaction
     const { id, username } = interaction.user
 
-    const result = await joinGame(id, channelId)
+    const result = await joinRoom(id, channelId)
 
-    if (result === 'JOINABLE_GAME_DOES_NOT_EXIST') {
+    if (result === 'ROOM_DOES_NOT_EXIST') {
       await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')
       return
     }
@@ -27,15 +27,15 @@ const handler: CommandHandler = {
       return
     }
 
-    if (result.status === 'joinable') {
-      await interaction.reply(`ゲーム参加 ${username} (R${result.rating.mu}) @${result.remainUsersCount}`)
+    const isPlayable = result.remainUsersCount === 0
+
+    if (isPlayable) {
+      const messages = [`ゲーム参加 ${username} (R${result.rating.mu}) @うまり`, '`/sr-match` でチーム分けしてください']
+      await interaction.reply(messages.join('\n'))
       return
     }
 
-    if (result.status === 'matched') {
-      const messages = [`ゲーム参加 ${username} (R${result.rating.mu}) @うまり`, await inspectTeamsUsers(result.gameMatching.teamsRatingIds as string[][])]
-      await interaction.reply(messages.join('\n'))
-    }
+    await interaction.reply(`ゲーム参加 ${username} (R${result.rating.mu}) @${result.remainUsersCount}`)
   },
 }
 

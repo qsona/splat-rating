@@ -12,50 +12,37 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(cuid())
-  name         String
-  createdAt    DateTime       @default(now())
-  Rating       Rating[]
-  JoinedUser   JoinedUser[]
-  JoinableGame JoinableGame[]
-  PlayingGame  PlayingGame[]
+  id         String       @id @default(cuid())
+  name       String
+  createdAt  DateTime     @default(now())
+  Rating     Rating[]
+  JoinedUser JoinedUser[]
+  Room       Room[]
 }
 
-model JoinableGame {
+model Room {
   id               String   @id @default(cuid())
   discordChannelId String
   rule             String
   createdAt        DateTime @default(now())
   creatorUserId    String
   creator          User     @relation(fields: [creatorUserId], references: [id])
-  totalGameCount   Int
 
   JoinedUser JoinedUser[]
+  Matching   Matching[]
+
   @@unique([discordChannelId])
 }
 
 model JoinedUser {
-  id             String       @id @default(cuid())
-  userId         String
-  user           User         @relation(fields: [userId], references: [id])
-  joinableGameId String
-  joinableGame   JoinableGame @relation(fields: [joinableGameId], references: [id])
-  createdAt      DateTime     @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  createdAt DateTime @default(now())
 
-  @@unique([joinableGameId, userId])
-}
-
-model PlayingGame {
-  id               String   @id
-  discordChannelId String
-  rule             String
-  creatorUserId    String
-  creator          User     @relation(fields: [creatorUserId], references: [id])
-  totalGameCount   Int
-  currentGameCount Int
-  createdAt        DateTime @default(now())
-
-  @@unique([discordChannelId, creatorUserId])
+  @@unique([roomId, userId])
 }
 
 model Rating {
@@ -70,17 +57,17 @@ model Rating {
 }
 
 model GameResult {
-  id                 String @id @default(cuid())
-  winnerTeamsRatings Json
-  loserTeamsRatings  Json
-  beta               Float
-  metadata           Json?
+  id                String @id @default(cuid())
+  winnerTeamRatings Json
+  loserTeamRatings  Json
+  beta              Float
+  metadata          Json?
 }
 
-model GameMatching {
+model Matching {
   id             String @id @default(cuid())
   teamsRatingIds Json
   metadata       Json?
-  playingGameId  String @unique
-  // playingGame    PlayingGame @relation(fields: [playingGameId], references: [id])
+  roomId         String @unique
+  room           Room   @relation(fields: [roomId], references: [id])
 }
