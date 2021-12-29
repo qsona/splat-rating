@@ -1,6 +1,6 @@
 import { CommandHandler } from '../../bot'
 
-import { createNewGame } from '../operations'
+import { createRoom } from '../operations/createRoom'
 import { SplatRuleSet, getRuleName } from '../rules'
 
 const handler: CommandHandler = {
@@ -11,11 +11,10 @@ const handler: CommandHandler = {
 
     const rule = interaction.options.getString('rule') as SplatRuleSet
     const ruleName = getRuleName(rule)
-    const gameCount = interaction.options.getInteger('gamecount')!
 
-    const result = await createNewGame(id, channelId, rule, gameCount)
+    const result = await createRoom(id, channelId, rule)
 
-    if (result === 'JOINABLE_GAME_ALREADY_EXISTS') {
+    if (result === 'ROOM_ALREADY_EXISTS') {
       await interaction.reply('すでにこのチャンネルに募集中のゲームがあります。')
       return
     }

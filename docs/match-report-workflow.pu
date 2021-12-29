@@ -1,0 +1,7 @@
+@startuml
+
+[*] --> Joinable: sr-newgame
+Joinable --> Joinable: sr-join
+Joinable --> Joinable: sr-leave
+Joinable --> Playing: match
+Playing --> Joinable: report

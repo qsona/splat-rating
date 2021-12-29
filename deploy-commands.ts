@@ -35,15 +35,25 @@ const commands = [
         .setDescription('ルール種別')
         .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
         .setRequired(true)
-    )
-    .addIntegerOption((option) => option.setName('gamecount').setDescription('試合数').setMinValue(1).setMaxValue(7).setRequired(true)),
+    ),
   new SlashCommandBuilder().setName('sr-join').setDescription('ゲームに参加する'),
   new SlashCommandBuilder().setName('sr-leave').setDescription('ゲームから抜ける'),
   new SlashCommandBuilder().setName('sr-break').setDescription('ゲームを解散する'),
+  new SlashCommandBuilder().setName('sr-match').setDescription('自動チーム分けを行う'),
   new SlashCommandBuilder()
     .setName('sr-report')
-    .setDescription('結果を報告する')
-    .addBooleanOption((option) => option.setName('win').setDescription('勝った?').setRequired(true)),
+    .setDescription('結果を報告/キャンセルする')
+    .addStringOption((option) =>
+      option
+        .setName('result')
+        .setDescription('勝敗')
+        .addChoices([
+          ['win', 'win'],
+          ['lose', 'lose'],
+          ['cancel', 'cancel'],
+        ])
+        .setRequired(true)
+    ),
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)

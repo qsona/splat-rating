@@ -1,6 +1,14 @@
 import * as Repl from 'repl'
 import { prisma } from './src/prismaClient'
-import { calculateMatchingWithMinRateDiff, createGameMatching, createGameResult } from './src/operations'
+
+import { registerUserAndRating } from './src/operations/registerUserAndRating'
+import { createRoom } from './src/operations/createRoom'
+import { joinRoom } from './src/operations/joinRoom'
+import { leaveRoom } from './src/operations/leaveRoom'
+import { breakRoom } from './src/operations/breakRoom'
+import { createMatching } from './src/operations/createMatching'
+import { reportMatching } from './src/operations/reportMatching'
+import { cancelMatching } from './src/operations/cancelMatching'
 
 // Print the welcome message
 console.log(`
@@ -14,9 +22,14 @@ const repl = Repl.start()
 repl.context.prisma = prisma
 
 Object.entries({
-  calculateMatchingWithMinRateDiff,
-  createGameMatching,
-  createGameResult,
+  registerUserAndRating,
+  createRoom,
+  joinRoom,
+  leaveRoom,
+  breakRoom,
+  createMatching,
+  reportMatching,
+  cancelMatching,
 }).forEach(([k, v]) => {
   repl.context[k] = v
 })

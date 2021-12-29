@@ -6,7 +6,7 @@ import newgameHandler from './src/commands/newgame'
 import joinHandler from './src/commands/join'
 import leaveHandler from './src/commands/leave'
 import breakHandler from './src/commands/break'
-import resultHandler from './src/commands/result'
+import resultHandler from './src/commands/report'
 
 require('dotenv').config()
 
