@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { prisma } from '../prismaClient'
 import { CommandHandler } from '../../bot'
+import { inspectRating } from '../inspectors'
 import { reportMatching, RatingResult } from '../operations/reportMatching'
 import { cancelMatching } from '../operations/cancelMatching'
 
@@ -62,7 +63,7 @@ const handler: CommandHandler = {
         .map((ratingResult) => {
           const ratingWithUser = ratingsWithUser.find((ru) => ru.id === ratingResult.ratingId)
           assert(ratingWithUser, `Rating not found. id: ${ratingResult.ratingId}`)
-          return `${ratingWithUser.user.name} (R${Math.floor(ratingResult.before.mu)}=>${Math.floor(ratingResult.after.mu)})`
+          return `${ratingWithUser.user.name} (${inspectRating(ratingResult.before.mu)}=>${inspectRating(ratingResult.after.mu)})`
         })
         .join(' ')
     }

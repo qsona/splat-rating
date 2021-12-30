@@ -1,9 +1,9 @@
 import assert from 'assert'
 import { Rating, User } from '@prisma/client'
-import { sumBy } from 'lodash'
 import { CommandHandler } from '../../bot'
 import { prisma } from '../prismaClient'
 import { createMatching } from '../operations/createMatching'
+import { inspectTeamUsers } from '../inspectors'
 
 const handler: CommandHandler = {
   commandName: 'sr-match',
@@ -35,7 +35,7 @@ const handler: CommandHandler = {
 const inspectTeamsUsers = async (teamsRatingIds: string[][]): Promise<string> => {
   const teamsUsers = await getTeamsUsers(teamsRatingIds)
 
-  const [alphaTeamUsers, bravoTeamUsers] = teamsUsers
+  const [alphaTeamUsers, bravoTeamUsers] = teamsUsers.map((tus) => tus.map((tu) => ({ mu: tu.mu, username: tu.user.name })))
 
   return `アルファチーム: ${inspectTeamUsers(alphaTeamUsers)}\nブラボーチーム: ${inspectTeamUsers(bravoTeamUsers)}`
 }
@@ -45,7 +45,7 @@ const getTeamsUsers = async (teamsRatingIds: string[][]) => {
     where: {
       id: { in: teamsRatingIds.flatMap((ids) => ids) },
     },
-    include: { user: true },
+    include: { user: { select: { name: true } } },
   })
   return teamsRatingIds.map((teamRatingIds) =>
     teamRatingIds.map((ratingId) => {
@@ -54,13 +54,6 @@ const getTeamsUsers = async (teamsRatingIds: string[][]) => {
       return ratingWithUser
     })
   )
-}
-
-// private
-const inspectTeamUsers = (teamUsers: (Rating & { user: User })[]) => {
-  const usersStr = teamUsers.map((ru) => `${ru.user.name} (R${ru.mu})`).join(' ')
-  const totalStr = `合計R(${sumBy(teamUsers, (ru) => ru.mu)}`
-  return `${totalStr} | ${usersStr}`
 }
 
 export default handler
