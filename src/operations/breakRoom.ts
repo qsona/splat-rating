@@ -21,11 +21,9 @@ export const breakRoom = async (userId: string, discordChannelId: string) => {
     return 'MATCHING_EXISTS'
   }
 
-  await prisma.room.delete({
-    where: {
-      id: room.id,
-    },
+  await prisma.$transaction(async (prisma) => {
+    await prisma.joinedUser.deleteMany({ where: { roomId: room.id } })
+    await prisma.room.delete({ where: { id: room.id } })
   })
-
   return { success: true }
 }
