@@ -27,15 +27,15 @@ const handler: CommandHandler = {
       return
     }
 
-    const isPlayable = result.remainUsersCount === 0
+    const remainMinUsersCount = Math.max(result.remainMaxUsersCount, 0)
+    const { remainMaxUsersCount } = result
+    const messages = [`${username} さんがゲームに参加しました。 (R${result.rating.mu})\n@${remainMinUsersCount}~${remainMaxUsersCount}`]
 
-    if (isPlayable) {
-      const messages = [`ゲーム参加 ${username} (R${result.rating.mu}) @うまり`, '`/sr-match` でチーム分けしてください']
-      await interaction.reply(messages.join('\n'))
-      return
+    if (result.remainMinUsersCount === 0) {
+      messages.push('ホストは `/sr-match` でチーム分けしてください')
     }
 
-    await interaction.reply(`${username} さんがゲームに参加しました。 (R${result.rating.mu})\n@${result.remainUsersCount}`)
+    await interaction.reply(messages.join('\n'))
   },
 }
 

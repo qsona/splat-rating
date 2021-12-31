@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { sum, difference } from 'lodash'
 import { Rating } from '@prisma/client'
 import { prisma } from '../prismaClient'
@@ -29,7 +30,7 @@ export const createMatching = async (userId: string, channelId: string) => {
     },
   })
 
-  if (joinedUsers.length !== 8) {
+  if (joinedUsers.length < 8) {
     return 'JOINED_USERS_NOT_ENOUGH'
   }
 
@@ -52,21 +53,39 @@ export const createMatching = async (userId: string, channelId: string) => {
     throw new Error(`rating of creator does not exist`)
   }
   const creatorRating = ratings[creatorRatingIndex]
+  // temporarily remove creator
   ratings.splice(creatorRatingIndex, 1)
+
+  // Decide watching (kansen) members
+  const watchingUserRatings: Rating[] = []
+  assert(ratings.length >= 7)
+  while (ratings.length > 7) {
+    // pick watching user randomly except creator
+    const watchingUserIndex = Math.floor(Math.random() * ratings.length)
+    watchingUserRatings.push(ratings[watchingUserIndex])
+    ratings.splice(watchingUserIndex, 1)
+  }
+
+  // put creator to head
   ratings.unshift(creatorRating)
 
   const teamsRatings = calculateMatchingWithMinRateDiff(ratings)
+
+  const watchingUserIds = watchingUserRatings.map((r) => r.userId)
 
   const matching = await prisma.matching.create({
     data: {
       room: { connect: { id: room.id } },
       teamsRatingIds: teamsRatings.map((teamRatings) => teamRatings.map((r) => r.id)),
+      metadata: { watchingUserIds },
     },
   })
-  return { matching }
+  return { matching, watchingUserIds }
 }
 
+// the first element of ratings must be creator's rating
 export const calculateMatchingWithMinRateDiff = (ratings: Rating[]) => {
+  assert.equal(ratings.length, 8)
   let minRateDiff = Number.POSITIVE_INFINITY
   let rates = ratings.map((r) => r.mu)
   let totalRate = sum(rates)

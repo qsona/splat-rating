@@ -24,7 +24,7 @@ export const joinRoom = async (userId: string, discordChannelId: string) => {
       roomId: room.id,
     },
   })
-  if (joinedUsersCount >= 8) {
+  if (joinedUsersCount >= 10) {
     return 'TOO_MANY_JOINED_USERS'
   }
 
@@ -48,7 +48,8 @@ export const joinRoom = async (userId: string, discordChannelId: string) => {
     joinedUser,
     room,
     joinedUsersCount: joinedUsersCount,
-    remainUsersCount: 8 - joinedUsersCount,
+    remainMinUsersCount: 8 - joinedUsersCount,
+    remainMaxUsersCount: 10 - joinedUsersCount,
     rating,
   }
 }

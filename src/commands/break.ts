@@ -18,7 +18,7 @@ const handler: CommandHandler = {
       return
     }
 
-    await interaction.reply('このチャンネルのゲームを解散しました')
+    await interaction.reply('このチャンネルのゲームを解散しました。')
   },
 }
 

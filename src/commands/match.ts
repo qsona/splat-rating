@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { Rating, User } from '@prisma/client'
 import { CommandHandler } from '../../bot'
 import { prisma } from '../prismaClient'
 import { createMatching } from '../operations/createMatching'
@@ -26,9 +25,13 @@ const handler: CommandHandler = {
       return
     }
 
-    const { matching } = result
-    const message = await inspectTeamsUsers(matching.teamsRatingIds as string[][])
-    await interaction.reply(message)
+    const { matching, watchingUserIds } = result
+    const messages = [await inspectTeamsUsers(matching.teamsRatingIds as string[][])]
+    if (watchingUserIds.length > 0) {
+      const usernames = (await prisma.user.findMany({ where: { id: { in: watchingUserIds } }, select: { name: true } })).map((u) => u.name)
+      messages.push(`観戦: ${usernames.join(' ')}`)
+    }
+    await interaction.reply(messages.join('\n'))
   },
 }
 
