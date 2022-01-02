@@ -6,6 +6,7 @@ import newgameHandler from './src/commands/newgame'
 import joinHandler from './src/commands/join'
 import leaveHandler from './src/commands/leave'
 import breakHandler from './src/commands/break'
+import matchHandler from './src/commands/match'
 import resultHandler from './src/commands/report'
 
 require('dotenv').config()
@@ -40,7 +41,7 @@ const pingHandler: CommandHandler = {
   },
 }
 
-;[registerHandler, newgameHandler, joinHandler, leaveHandler, breakHandler, resultHandler, pingHandler].forEach((handler) => {
+;[registerHandler, newgameHandler, joinHandler, leaveHandler, matchHandler, breakHandler, resultHandler, pingHandler].forEach((handler) => {
   handlers.set(handler.commandName, handler)
 })
 

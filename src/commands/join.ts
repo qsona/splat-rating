@@ -27,7 +27,7 @@ const handler: CommandHandler = {
       return
     }
 
-    const remainMinUsersCount = Math.max(result.remainMaxUsersCount, 0)
+    const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
     const { remainMaxUsersCount } = result
     const messages = [`${username} さんがゲームに参加しました。 (R${result.rating.mu})\n@${remainMinUsersCount}~${remainMaxUsersCount}`]
 
