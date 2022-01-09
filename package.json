@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./bot.ts",
+    "bot": "ts-node ./bot.ts",
     "repl": "ts-node ./repl.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
