@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "bot": "ts-node ./bot.ts",
+    "predeploy": "prisma migrate deploy",
     "repl": "ts-node ./repl.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
