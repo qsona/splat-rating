@@ -35,7 +35,7 @@ export interface CommandHandler {
 
 const handlers = new Map<string, CommandHandler>()
 const pingHandler: CommandHandler = {
-  commandName: 'ping',
+  commandName: 'sr-ping',
   execute: async (interaction) => {
     await interaction.reply('Pong!')
   },

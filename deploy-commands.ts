@@ -13,7 +13,7 @@ if (!token || !guildId || !clientId) {
 }
 
 const commands = [
-  new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
+  new SlashCommandBuilder().setName('sr-ping').setDescription('Replies with pong!'),
   new SlashCommandBuilder()
     .setName('sr-register')
     .setDescription('レーティング登録')
@@ -59,6 +59,7 @@ const commands = [
 const rest = new REST({ version: '9' }).setToken(token)
 
 rest
-  .put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+  // .put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+  .put(Routes.applicationCommands(clientId), { body: commands })
   .then(() => console.log('Successfully registered application commands.'))
   .catch(console.error)
