@@ -77,6 +77,31 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
       },
     })
 
+    await prisma.rating.updateMany({
+      where: {
+        id: {
+          in: winnerTeamRatings.map((r) => r.ratingId),
+        },
+      },
+      data: {
+        winCount: {
+          increment: 1,
+        },
+      },
+    })
+    await prisma.rating.updateMany({
+      where: {
+        id: {
+          in: loserTeamRatings.map((r) => r.ratingId),
+        },
+      },
+      data: {
+        loseCount: {
+          increment: 1,
+        },
+      },
+    })
+
     await prisma.matching.delete({
       where: { id: matching.id },
     })

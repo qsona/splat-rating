@@ -46,12 +46,14 @@ model JoinedUser {
 }
 
 model Rating {
-  id     String @id @default(cuid())
-  mu     Float
-  sigma  Float
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-  rule   String
+  id        String @id @default(cuid())
+  mu        Float
+  sigma     Float
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  rule      String
+  winCount  Int    @default(0)
+  loseCount Int    @default(0)
 
   @@unique([userId, rule])
 }

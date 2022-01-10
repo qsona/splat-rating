@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Rating" ADD COLUMN     "loseCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "winCount" INTEGER NOT NULL DEFAULT 0;
