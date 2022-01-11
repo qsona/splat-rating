@@ -43,8 +43,10 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
     console.log('win', newTeamsRatings[0])
     console.log('lose', newTeamsRatings[1])
     const [winnerTeamRatings, loserTeamRatings]: RatingResult[][] = await Aigle.map(sortedTeamsRatings, async (teamRatings, teamIndex) => {
+      const isWinner = teamIndex === 0
       return await Aigle.map(teamRatings, async (rating, ratingIndex) => {
         const newRating = newTeamsRatings[teamIndex][ratingIndex]
+        const additionalUpdateData = isWinner ? { winCount: { increment: 1 } } : { loseCount: { increment: 1 } }
         await prisma.rating.update({
           where: {
             id: rating.id,
@@ -52,6 +54,7 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
           data: {
             mu: newRating.mu,
             sigma: newRating.sigma,
+            ...additionalUpdateData,
           },
         })
 
@@ -74,31 +77,6 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
         beta: BETA,
         winnerTeamRatings,
         loserTeamRatings,
-      },
-    })
-
-    await prisma.rating.updateMany({
-      where: {
-        id: {
-          in: winnerTeamRatings.map((r) => r.ratingId),
-        },
-      },
-      data: {
-        winCount: {
-          increment: 1,
-        },
-      },
-    })
-    await prisma.rating.updateMany({
-      where: {
-        id: {
-          in: loserTeamRatings.map((r) => r.ratingId),
-        },
-      },
-      data: {
-        loseCount: {
-          increment: 1,
-        },
       },
     })
 
