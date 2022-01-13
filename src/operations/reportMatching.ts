@@ -6,6 +6,7 @@ const BETA = 200
 
 export type RatingResult = {
   ratingId: string
+  userId: string
   before: { mu: number; sigma: number }
   after: { mu: number; sigma: number }
 }
@@ -29,7 +30,9 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
 
   return await prisma.$transaction(async (prisma) => {
     const teamsRatings = await Aigle.map(matching.teamsRatingIds as string[][], async (teamRatingIds) => {
-      const teamRatings = await prisma.rating.findMany({ where: { id: { in: teamRatingIds } } })
+      const teamRatings = await prisma.rating.findMany({
+        where: { id: { in: teamRatingIds } },
+      })
       return teamRatingIds.map((teamRatingId) => {
         const rating = teamRatings.find((r) => r.id === teamRatingId)
         if (!rating) {
@@ -60,6 +63,7 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
 
         return {
           ratingId: rating.id,
+          userId: rating.userId,
           before: {
             mu: rating.mu,
             sigma: rating.sigma,
@@ -75,17 +79,41 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
     const gameResult = await prisma.gameResult.create({
       data: {
         beta: BETA,
+        rule: room.rule,
         winnerTeamRatings,
         loserTeamRatings,
       },
     })
 
-    await prisma.matching.delete({
-      where: { id: matching.id },
+    await prisma.gameResultRating.createMany({
+      data: [
+        ...winnerTeamRatings.map((r) => {
+          return {
+            ratingId: r.ratingId,
+            muBefore: r.before.mu,
+            sigmaBefore: r.before.sigma,
+            muAfter: r.after.mu,
+            sigmaAfter: r.after.sigma,
+            isWinner: true,
+            userId: r.userId,
+            gameResultId: gameResult.id,
+          }
+        }),
+        ...loserTeamRatings.map((r) => {
+          return {
+            ratingId: r.ratingId,
+            muBefore: r.before.mu,
+            sigmaBefore: r.before.sigma,
+            muAfter: r.after.mu,
+            sigmaAfter: r.after.sigma,
+            isWinner: false,
+            userId: r.userId,
+            gameResultId: gameResult.id,
+          }
+        }),
+      ],
     })
 
-    return {
-      gameResult,
-    }
+    return { gameResult }
   })
 }

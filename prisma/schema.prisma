@@ -12,12 +12,13 @@ datasource db {
 }
 
 model User {
-  id         String       @id @default(cuid())
-  name       String
-  createdAt  DateTime     @default(now())
-  Rating     Rating[]
-  JoinedUser JoinedUser[]
-  Room       Room[]
+  id               String             @id @default(cuid())
+  name             String
+  createdAt        DateTime           @default(now())
+  Rating           Rating[]
+  JoinedUser       JoinedUser[]
+  Room             Room[]
+  GameResultRating GameResultRating[]
 }
 
 model Room {
@@ -46,30 +47,58 @@ model JoinedUser {
 }
 
 model Rating {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   mu        Float
   sigma     Float
   userId    String
-  user      User   @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   rule      String
-  winCount  Int    @default(0)
-  loseCount Int    @default(0)
+  winCount  Int      @default(0)
+  loseCount Int      @default(0)
+  createdAt DateTime @default(now())
 
+  GameResultRating GameResultRating[]
   @@unique([userId, rule])
 }
 
 model GameResult {
-  id                String @id @default(cuid())
+  id                String             @id @default(cuid())
   winnerTeamRatings Json
   loserTeamRatings  Json
   beta              Float
   metadata          Json?
+  rule              String             @default("SplatZones") // remove default value later
+  createdAt         DateTime           @default(now())
+  GameResultRating  GameResultRating[]
+}
+
+model GameResultRating {
+  id           String     @id @default(cuid())
+  gameResultId String
+  gameResult   GameResult @relation(fields: [gameResultId], references: [id])
+  ratingId     String
+  rating       Rating     @relation(fields: [ratingId], references: [id])
+  isWinner     Boolean
+  muBefore     Float
+  muAfter      Float
+  sigmaBefore  Float
+  sigmaAfter   Float
+
+  // redundant column for filtering
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([gameResultId, ratingId])
+  @@index([userId, createdAt])
 }
 
 model Matching {
-  id             String @id @default(cuid())
+  id             String   @id @default(cuid())
   teamsRatingIds Json
   metadata       Json?
-  roomId         String @unique
-  room           Room   @relation(fields: [roomId], references: [id])
+  roomId         String   @unique
+  room           Room     @relation(fields: [roomId], references: [id])
+  createdAt      DateTime @default(now())
 }
