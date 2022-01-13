@@ -114,6 +114,8 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
       ],
     })
 
+    await prisma.matching.delete({ where: { id: matching.id } })
+
     return { gameResult }
   })
 }
