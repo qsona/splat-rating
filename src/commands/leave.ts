@@ -24,7 +24,9 @@ const handler: CommandHandler = {
       return
     }
 
-    await interaction.reply(`${username} さんがゲームから抜けました。\n@${result.remainUsersCount}`)
+    // TODO: commonize this logic with join.ts
+    const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
+    await interaction.reply(`${username} さんがゲームから抜けました。\n@${remainMinUsersCount}~${result.remainMaxUsersCount}`)
   },
 }
 

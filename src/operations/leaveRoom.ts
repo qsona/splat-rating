@@ -40,6 +40,7 @@ export const leaveRoom = async (userId: string, discordChannelId: string) => {
   return {
     room,
     joinedUsersCount: joinedUsersCount,
-    remainUsersCount: 8 - joinedUsersCount,
+    remainMinUsersCount: 8 - joinedUsersCount,
+    remainMaxUsersCount: 10 - joinedUsersCount,
   }
 }

@@ -1,6 +1,7 @@
 import { CommandHandler } from '../../bot'
 
 import { joinRoom } from '../operations/joinRoom'
+import { inspectRating } from '../inspectors'
 
 const handler: CommandHandler = {
   commandName: 'sr-join',
@@ -29,7 +30,7 @@ const handler: CommandHandler = {
 
     const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
     const { remainMaxUsersCount } = result
-    const messages = [`${username} さんがゲームに参加しました。 (R${result.rating.mu})\n@${remainMinUsersCount}~${remainMaxUsersCount}`]
+    const messages = [`${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`]
 
     if (result.remainMinUsersCount === 0) {
       messages.push('ホストは `/sr-match` でチーム分けしてください')

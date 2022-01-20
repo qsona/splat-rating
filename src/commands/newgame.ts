@@ -2,6 +2,7 @@ import { CommandHandler } from '../../bot'
 
 import { createRoom } from '../operations/createRoom'
 import { SplatRuleSet, getRuleName } from '../rules'
+import { inspectRating } from '../inspectors'
 
 const handler: CommandHandler = {
   commandName: 'sr-newgame',
@@ -23,7 +24,7 @@ const handler: CommandHandler = {
       return
     }
 
-    await interaction.reply(`ゲーム募集 ${ruleName} ホスト: ${username} (R${result.rating.mu}) @7`)
+    await interaction.reply(`ゲーム募集 ${ruleName} ホスト: ${username} (${inspectRating(result.rating.mu)}) @7~9`)
   },
 }
 
