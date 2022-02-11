@@ -1,6 +1,7 @@
 import express from 'express'
 import passport from 'passport'
 import { prisma } from './src/prismaClient'
+import { SPLAT_RULES_NAME_MAP } from './src/rules'
 const DiscordStrategy = require('passport-discord').Strategy
 
 require('dotenv').config()
@@ -16,6 +17,17 @@ app.get('/', (req, res) => {
 app.get('/users', async (req, res) => {
   const users = await prisma.user.findMany()
   res.render('users', { users })
+})
+
+app.get('/users/:id', async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+    include: { ratings: true },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.listen(port, () => {

@@ -15,7 +15,7 @@ model User {
   id               String             @id @default(cuid())
   name             String
   createdAt        DateTime           @default(now())
-  Rating           Rating[]
+  ratings          Rating[]
   JoinedUser       JoinedUser[]
   Room             Room[]
   GameResultRating GameResultRating[]
