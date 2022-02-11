@@ -54,6 +54,23 @@ const commands = [
         ])
         .setRequired(true)
     ),
+  new SlashCommandBuilder()
+    .setName('sr-m-register')
+    .setDescription('レーティング登録')
+    .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
+    .addStringOption((option) =>
+      option
+        .setName('rule')
+        .setDescription('ルール種別')
+        .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
+        .setRequired(true)
+    )
+    .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
+    .setDescription('ユーザー登録'),
+  new SlashCommandBuilder()
+    .setName('sr-m-join')
+    .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
+    .setDescription('ゲームに参加する'),
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)
