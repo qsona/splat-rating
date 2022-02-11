@@ -56,7 +56,7 @@ const commands = [
     ),
   new SlashCommandBuilder()
     .setName('sr-m-register')
-    .setDescription('レーティング登録')
+    .setDescription('他ユーザーをレーティング登録させる')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
     .addStringOption((option) =>
       option
@@ -70,7 +70,11 @@ const commands = [
   new SlashCommandBuilder()
     .setName('sr-m-join')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
-    .setDescription('ゲームに参加する'),
+    .setDescription('他ユーザーをゲームに参加させる'),
+  new SlashCommandBuilder()
+    .setName('sr-m-leave')
+    .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
+    .setDescription('他ユーザーをゲームから抜けさせる'),
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)

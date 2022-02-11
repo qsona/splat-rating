@@ -10,6 +10,7 @@ import matchHandler from './src/commands/match'
 import resultHandler from './src/commands/report'
 import mRegisterHandler from './src/commands/m-register'
 import mJoinHandler from './src/commands/m-join'
+import mLeaveHandler from './src/commands/m-leave'
 
 require('dotenv').config()
 
@@ -43,11 +44,21 @@ const pingHandler: CommandHandler = {
   },
 }
 
-;[registerHandler, newgameHandler, joinHandler, leaveHandler, matchHandler, breakHandler, resultHandler, mRegisterHandler, mJoinHandler, pingHandler].forEach(
-  (handler) => {
-    handlers.set(handler.commandName, handler)
-  }
-)
+;[
+  registerHandler,
+  newgameHandler,
+  joinHandler,
+  leaveHandler,
+  matchHandler,
+  breakHandler,
+  resultHandler,
+  mRegisterHandler,
+  mJoinHandler,
+  mLeaveHandler,
+  pingHandler,
+].forEach((handler) => {
+  handlers.set(handler.commandName, handler)
+})
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) {
