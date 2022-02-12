@@ -14,6 +14,7 @@ if (!token || !guildId || !clientId) {
 
 const commands = [
   new SlashCommandBuilder().setName('sr-ping').setDescription('Replies with pong!'),
+  new SlashCommandBuilder().setName('sr-help').setDescription('ヘルプを表示します'),
   new SlashCommandBuilder()
     .setName('sr-register')
     .addStringOption((option) =>
