@@ -40,7 +40,7 @@ const handlers = new Map<string, CommandHandler>()
 const pingHandler: CommandHandler = {
   commandName: 'sr-ping',
   execute: async (interaction) => {
-    await interaction.reply('Pong!')
+    await interaction.reply(`Pong! User: ${interaction.user.username} Server info: ${interaction.guild?.name} ${interaction.guild?.id}`)
   },
 }
 const helpHandler: CommandHandler = {
