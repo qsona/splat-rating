@@ -8,9 +8,9 @@ import leaveHandler from './src/commands/leave'
 import breakHandler from './src/commands/break'
 import matchHandler from './src/commands/match'
 import resultHandler from './src/commands/report'
-import mRegisterHandler from './src/commands/m-register'
-import mJoinHandler from './src/commands/m-join'
-import mLeaveHandler from './src/commands/m-leave'
+import makeRegisterHandler from './src/commands/make-register'
+import makeJoinHandler from './src/commands/make-join'
+import makeLeaveHandler from './src/commands/make-leave'
 
 require('dotenv').config()
 
@@ -43,6 +43,12 @@ const pingHandler: CommandHandler = {
     await interaction.reply('Pong!')
   },
 }
+const helpHandler: CommandHandler = {
+  commandName: 'sr-help',
+  execute: async (interaction) => {
+    await interaction.reply('参加する人は /sr-register でレーティング登録をして /sr-join で参加してね! \n参考URL: https://qsona.github.io/splat-rating/')
+  },
+}
 
 ;[
   registerHandler,
@@ -52,10 +58,11 @@ const pingHandler: CommandHandler = {
   matchHandler,
   breakHandler,
   resultHandler,
-  mRegisterHandler,
-  mJoinHandler,
-  mLeaveHandler,
+  makeRegisterHandler,
+  makeJoinHandler,
+  makeLeaveHandler,
   pingHandler,
+  helpHandler,
 ].forEach((handler) => {
   handlers.set(handler.commandName, handler)
 })
