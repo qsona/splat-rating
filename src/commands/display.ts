@@ -31,7 +31,7 @@ const handler: CommandHandler = {
     })
     const messages = [
       remainMaxUsersCount === 0 ? 'ゲーム中(満員)' : `ゲーム募集中@${remainMinUsersCount}~${remainMaxUsersCount}`,
-      usersInfo.map((u) => `${u.name} ${inspectRating(u.rating.mu)}`).join(' '),
+      usersInfo.map((u) => `${u.name} (${inspectRating(u.rating.mu)})`).join(' '),
     ]
 
     await interaction.reply(messages.join('\n'))
