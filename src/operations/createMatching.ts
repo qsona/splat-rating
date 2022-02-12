@@ -45,7 +45,7 @@ export const createMatching = async (userId: string, channelId: string) => {
     throw new Error(`mismatch between ratings and joinedUsers. userIds: ${joinedUserIds}`)
   }
 
-  const { creatorUserId } = room
+  const { creatorUserId, watchedUserIds } = room
 
   // move creator rating to first
   const creatorRatingIndex = ratings.findIndex((r) => r.userId === creatorUserId)
@@ -59,9 +59,17 @@ export const createMatching = async (userId: string, channelId: string) => {
   // Decide watching (kansen) members
   const watchingUserRatings: Rating[] = []
   assert(ratings.length >= 7)
+
+  const watchingExcludingUserIds = watchedUserIds.slice(-4)
   while (ratings.length > 7) {
     // pick watching user randomly except creator
     const watchingUserIndex = Math.floor(Math.random() * ratings.length)
+
+    // temporary logic: avoid selecting users who watched last
+    if (watchingExcludingUserIds.includes(ratings[watchingUserIndex].userId)) {
+      continue
+    }
+
     watchingUserRatings.push(ratings[watchingUserIndex])
     ratings.splice(watchingUserIndex, 1)
   }
@@ -78,6 +86,14 @@ export const createMatching = async (userId: string, channelId: string) => {
       room: { connect: { id: room.id } },
       teamsRatingIds: teamsRatings.map((teamRatings) => teamRatings.map((r) => r.id)),
       metadata: { watchingUserIds },
+    },
+  })
+  await prisma.room.update({
+    where: { id: room.id },
+    data: {
+      watchedUserIds: {
+        push: watchingUserIds,
+      },
     },
   })
   return { matching, watchingUserIds }
