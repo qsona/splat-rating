@@ -16,7 +16,6 @@ const commands = [
   new SlashCommandBuilder().setName('sr-ping').setDescription('Replies with pong!'),
   new SlashCommandBuilder()
     .setName('sr-register')
-    .setDescription('レーティング登録')
     .addStringOption((option) =>
       option
         .setName('rule')
@@ -25,7 +24,7 @@ const commands = [
         .setRequired(true)
     )
     .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
-    .setDescription('ユーザー登録'),
+    .setDescription('レーティング登録'),
   new SlashCommandBuilder()
     .setName('sr-newgame')
     .setDescription('ゲームを立てて参加者を募集する')
@@ -55,8 +54,7 @@ const commands = [
         .setRequired(true)
     ),
   new SlashCommandBuilder()
-    .setName('sr-m-register')
-    .setDescription('他ユーザーをレーティング登録させる')
+    .setName('sr-make-register')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
     .addStringOption((option) =>
       option
@@ -66,13 +64,13 @@ const commands = [
         .setRequired(true)
     )
     .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
-    .setDescription('ユーザー登録'),
+    .setDescription('他ユーザーをレーティング登録させる'),
   new SlashCommandBuilder()
-    .setName('sr-m-join')
+    .setName('sr-make-join')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
     .setDescription('他ユーザーをゲームに参加させる'),
   new SlashCommandBuilder()
-    .setName('sr-m-leave')
+    .setName('sr-make-leave')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
     .setDescription('他ユーザーをゲームから抜けさせる'),
 ].map((command) => command.toJSON())

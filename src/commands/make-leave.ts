@@ -3,7 +3,7 @@ import { leaveRoom } from '../operations/leaveRoom'
 import { getUserFromMentionable } from './helpers/mentionable'
 
 const handler: CommandHandler = {
-  commandName: 'sr-m-leave',
+  commandName: 'sr-make-leave',
   execute: async (interaction) => {
     const { channelId } = interaction
     const mentionable = interaction.options.getMentionable('user')!

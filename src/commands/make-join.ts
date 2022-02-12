@@ -5,7 +5,7 @@ import { inspectRating } from '../inspectors'
 import { getUserFromMentionable } from './helpers/mentionable'
 
 const handler: CommandHandler = {
-  commandName: 'sr-m-join',
+  commandName: 'sr-make-join',
   execute: async (interaction) => {
     const { channelId } = interaction
     const mentionable = interaction.options.getMentionable('user')!

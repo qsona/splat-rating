@@ -5,7 +5,7 @@ import { registerUserAndRating } from '../operations/registerUserAndRating'
 import { getUserFromMentionable } from './helpers/mentionable'
 
 const handler: CommandHandler = {
-  commandName: 'sr-m-register',
+  commandName: 'sr-make-register',
   execute: async (interaction) => {
     const mentionable = interaction.options.getMentionable('user')!
     const user = getUserFromMentionable(mentionable)
