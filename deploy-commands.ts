@@ -40,6 +40,7 @@ const commands = [
   new SlashCommandBuilder().setName('sr-leave').setDescription('ゲームから抜ける'),
   new SlashCommandBuilder().setName('sr-break').setDescription('ゲームを解散する'),
   new SlashCommandBuilder().setName('sr-match').setDescription('自動チーム分けを行う'),
+  new SlashCommandBuilder().setName('sr-display').setDescription('現在のゲーム情報を表示する'),
   new SlashCommandBuilder()
     .setName('sr-report')
     .setDescription('結果を報告/キャンセルする')

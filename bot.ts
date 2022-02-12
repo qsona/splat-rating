@@ -11,6 +11,7 @@ import resultHandler from './src/commands/report'
 import makeRegisterHandler from './src/commands/make-register'
 import makeJoinHandler from './src/commands/make-join'
 import makeLeaveHandler from './src/commands/make-leave'
+import displayHandler from './src/commands/display'
 
 require('dotenv').config()
 
@@ -61,6 +62,7 @@ const helpHandler: CommandHandler = {
   makeRegisterHandler,
   makeJoinHandler,
   makeLeaveHandler,
+  displayHandler,
   pingHandler,
   helpHandler,
 ].forEach((handler) => {
