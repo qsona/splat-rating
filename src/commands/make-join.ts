@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 import { CommandHandler } from '../../bot'
 
 import { joinRoom } from '../operations/joinRoom'
@@ -7,7 +9,8 @@ import { getUserFromMentionable } from './helpers/mentionable'
 const handler: CommandHandler = {
   commandName: 'sr-make-join',
   execute: async (interaction) => {
-    const { channelId } = interaction
+    const { channelId, guildId } = interaction
+    assert(guildId)
     const mentionable = interaction.options.getMentionable('user')!
     const user = getUserFromMentionable(mentionable)
     if (!user) {
@@ -17,7 +20,7 @@ const handler: CommandHandler = {
     }
     const { id, username } = user
 
-    const result = await joinRoom(id, channelId)
+    const result = await joinRoom(id, channelId, guildId)
 
     if (result === 'ROOM_DOES_NOT_EXIST') {
       await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')

@@ -17,7 +17,7 @@ const handler: CommandHandler = {
     }
 
     const joinedUsers = await prisma.joinedUser.findMany({ where: { roomId: room.id }, include: { user: true } })
-    const ratings = await prisma.rating.findMany({ where: { rule: room.rule, userId: { in: joinedUsers.map((ju) => ju.userId) } } })
+    const ratings = await prisma.rating.findMany({ where: { id: { in: joinedUsers.map((ju) => ju.ratingId) } } })
 
     // TODO: commonize logic
     const remainMinUsersCount = Math.max(8 - joinedUsers.length, 0)
@@ -25,7 +25,7 @@ const handler: CommandHandler = {
 
     const usersInfo = joinedUsers.map((ju) => {
       const name = ju.user.name
-      const rating = ratings.find((r) => r.userId === ju.userId)
+      const rating = ratings.find((r) => r.id === ju.ratingId)
       assert(rating)
       return { rating, name }
     })

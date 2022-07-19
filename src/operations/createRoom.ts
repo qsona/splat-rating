@@ -2,12 +2,19 @@ import { Room } from '@prisma/client'
 import { prisma } from '../prismaClient'
 import { SplatRuleSet } from '../rules'
 
-export const createRoom = async (creatorUserId: string, discordChannelId: string, rule: SplatRuleSet) => {
-  const rating = await prisma.rating.findUnique({
-    where: {
-      userId_rule: { userId: creatorUserId, rule },
-    },
-  })
+export const createRoom = async (creatorUserId: string, discordChannelId: string, rule: SplatRuleSet, guildId: string) => {
+  const rating =
+    (await prisma.rating.findUnique({
+      where: {
+        userId_guildId_rule: { userId: creatorUserId, guildId, rule },
+      },
+    })) ||
+    (await prisma.rating.findFirst({
+      where: {
+        userId: creatorUserId,
+        rule,
+      },
+    }))
   if (!rating) {
     return 'RATING_DOES_NOT_EXIST'
   }
@@ -32,6 +39,7 @@ export const createRoom = async (creatorUserId: string, discordChannelId: string
       data: {
         room: { connect: { id: room.id } },
         user: { connect: { id: creatorUserId } },
+        rating: { connect: { id: rating.id } },
       },
     })
 

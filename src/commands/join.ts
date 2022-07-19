@@ -1,4 +1,5 @@
 import { CommandHandler } from '../../bot'
+import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectRating } from '../inspectors'
@@ -6,10 +7,11 @@ import { inspectRating } from '../inspectors'
 const handler: CommandHandler = {
   commandName: 'sr-join',
   execute: async (interaction) => {
-    const { channelId } = interaction
+    const { channelId, guildId } = interaction
+    assert(guildId)
     const { id, username } = interaction.user
 
-    const result = await joinRoom(id, channelId)
+    const result = await joinRoom(id, channelId, guildId)
 
     if (result === 'ROOM_DOES_NOT_EXIST') {
       await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')

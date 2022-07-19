@@ -34,15 +34,14 @@ export const createMatching = async (userId: string, channelId: string) => {
     return 'JOINED_USERS_NOT_ENOUGH'
   }
 
-  const joinedUserIds = joinedUsers.map((u) => u.userId)
+  const joinedUserRatingIds = joinedUsers.map((u) => u.ratingId)
   const ratings = await prisma.rating.findMany({
     where: {
-      userId: { in: joinedUserIds },
-      rule,
+      id: { in: joinedUserRatingIds },
     },
   })
   if (ratings.length !== joinedUsers.length) {
-    throw new Error(`mismatch between ratings and joinedUsers. userIds: ${joinedUserIds}`)
+    throw new Error(`mismatch between ratings and joinedUsers. ratingIds: ${joinedUserRatingIds}`)
   }
 
   const { creatorUserId, watchedUserIds } = room
