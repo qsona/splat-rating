@@ -10,19 +10,11 @@ export const joinRoom = async (userId: string, discordChannelId: string, guildId
     return 'ROOM_DOES_NOT_EXIST'
   }
   const { rule } = room
-  const rating =
-    (await prisma.rating.findUnique({
-      where: {
-        // userId_rule: { userId, rule },
-        userId_guildId_rule: { userId, guildId, rule },
-      },
-    })) ||
-    (await prisma.rating.findFirst({
-      where: {
-        userId,
-        rule,
-      },
-    }))
+  const rating = await prisma.rating.findUnique({
+    where: {
+      userId_guildId_rule: { userId, guildId, rule },
+    },
+  })
   if (!rating) {
     return 'RATING_DOES_NOT_EXIST'
   }
