@@ -56,14 +56,15 @@ model Rating {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   rule      String
-  guildId   String?
+  guildId   String
   winCount  Int      @default(0)
   loseCount Int      @default(0)
   createdAt DateTime @default(now())
 
   GameResultRating GameResultRating[]
+  JoinedUser       JoinedUser[]
+
   @@unique([userId, guildId, rule])
-  JoinedUser JoinedUser[]
 }
 
 model GameResult {
