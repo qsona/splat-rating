@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
-  <%- include('components/head'); %>
+  <head>
+    <meta charset="UTF-8" />
+    <title>user <%= user.name %> | splat-rating</title>
+  </head>
   <body>
     <p><%= user.name %></p>
     <% if (user.ratings) { %>
@@ -23,6 +26,5 @@
     <% } else { %>
       <p>対戦結果はまだありません</p>
     <% } %>
-    <%- include('components/footer-scripts'); %>
   </body>
 </html>

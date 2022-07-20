@@ -10,10 +10,30 @@ const app = express()
 const port = 3000
 
 app.set('view engine', 'ejs')
-app.use('/static', express.static(__dirname + '/public'))
+app.use('/assets', express.static(__dirname + '/assets'))
 app.get('/', (req, res) => {
   res.render('index')
 })
+
+app.get('/test', (req, res) => {
+  res.render('test')
+})
+
+app.get('/login', (req, res) => {
+  res.render('login')
+})
+
+app.get('/profile/:id', async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+    include: { Rating: true },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  res.render('profile', { user, rules: SPLAT_RULES_NAME_MAP })
+})
+
 app.get('/users', async (req, res) => {
   const users = await prisma.user.findMany()
   res.render('users', { users })
