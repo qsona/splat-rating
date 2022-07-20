@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 import { CommandHandler } from '../../bot'
 
 import { createRoom } from '../operations/createRoom'
@@ -7,13 +9,14 @@ import { inspectRating } from '../inspectors'
 const handler: CommandHandler = {
   commandName: 'sr-newgame',
   execute: async (interaction) => {
-    const { channelId } = interaction
+    const { channelId, guildId } = interaction
     const { id, username } = interaction.user
 
+    assert(guildId)
     const rule = interaction.options.getString('rule') as SplatRuleSet
     const ruleName = getRuleName(rule)
 
-    const result = await createRoom(id, channelId, rule)
+    const result = await createRoom(id, channelId, rule, guildId)
 
     if (result === 'ROOM_ALREADY_EXISTS') {
       await interaction.reply('すでにこのチャンネルに募集中のゲームがあります。')

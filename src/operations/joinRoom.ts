@@ -1,7 +1,7 @@
 import { JoinedUser } from '@prisma/client'
 import { prisma } from '../prismaClient'
 
-export const joinRoom = async (userId: string, discordChannelId: string) => {
+export const joinRoom = async (userId: string, discordChannelId: string, guildId: string) => {
   // TODO: acquire lock
   const room = await prisma.room.findUnique({
     where: { discordChannelId },
@@ -10,11 +10,19 @@ export const joinRoom = async (userId: string, discordChannelId: string) => {
     return 'ROOM_DOES_NOT_EXIST'
   }
   const { rule } = room
-  const rating = await prisma.rating.findUnique({
-    where: {
-      userId_rule: { userId, rule },
-    },
-  })
+  const rating =
+    (await prisma.rating.findUnique({
+      where: {
+        // userId_rule: { userId, rule },
+        userId_guildId_rule: { userId, guildId, rule },
+      },
+    })) ||
+    (await prisma.rating.findFirst({
+      where: {
+        userId,
+        rule,
+      },
+    }))
   if (!rating) {
     return 'RATING_DOES_NOT_EXIST'
   }
@@ -34,6 +42,7 @@ export const joinRoom = async (userId: string, discordChannelId: string) => {
       data: {
         room: { connect: { id: room.id } },
         user: { connect: { id: userId } },
+        rating: { connect: { id: rating.id } },
       },
     })
   } catch (e) {

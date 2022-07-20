@@ -4,7 +4,7 @@ import { Rating, User } from '@prisma/client'
 
 export const INITIAL_SIGMA = 200
 
-export const registerUserAndRating = async (userId: string, username: string, rule: SplatRuleSet, estimatedGachiPower: number) => {
+export const registerUserAndRating = async (userId: string, username: string, guildId: string, rule: SplatRuleSet, estimatedGachiPower: number) => {
   let isNewUser = true
   let user: User | null = null
   try {
@@ -27,6 +27,7 @@ export const registerUserAndRating = async (userId: string, username: string, ru
   try {
     rating = await prisma.rating.create({
       data: {
+        guildId,
         mu: estimatedGachiPower,
         sigma: INITIAL_SIGMA,
         user: { connect: { id: userId } },
