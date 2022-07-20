@@ -60,7 +60,12 @@ app.get('/history/:id', async (req, res) => {
   if (!user) {
     return res.status(404).send('User Not Found')
   }
-  res.render('history', { user })
+  const ratings = await prisma.gameResultRating.findMany({
+    where: { userId: user.id},
+    orderBy: { createdAt: 'desc'},
+    include: { gameResult: true }
+  })
+  res.render('history', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.get('/users', async (req, res) => {

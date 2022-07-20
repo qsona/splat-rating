@@ -2,7 +2,7 @@
 <html>
 <%- include('components/head'); %>
 
-<body id="page-top">
+<body id="page-top" class="sidebar-toggled">
     <div id="wrapper">
         <%- include('components/left-nav', { active: 'history', user: user }); %>
         <div class="d-flex flex-column" id="content-wrapper">
@@ -15,6 +15,41 @@
                             <p class="text-primary m-0 fw-bold">Matching List</p>
                         </div>
                         <div class="card-body">
+                            <% if (ratings) { %>
+                                <div class="row">
+                                    <div class="col-3">対戦日時</div>
+                                    <div class="col-3">ルール</div>
+                                    <div class="col-2">対戦結果</div>
+                                    <div class="col-2">対戦前パワー</div>
+                                    <div class="col-2">対戦後パワー</div>
+                                </div>
+                                <% ratings.forEach(function(rating) { %>
+                                    <div class="row">
+                                        <div class="col-3"><%= rating.createdAt.getFullYear() + '/' + (rating.createdAt.getMonth() + 1) + '/' + rating.createdAt.getDate() + ' ' + ('0' + rating.createdAt.getHours()).slice(-2) + ':' + ('0' + rating.createdAt.getMinutes()).slice(-2) %></div>
+                                        <div class="col-3">
+                                            <!-- TODO: to forEach -->
+                                            <% for (var i = 0; i < rules.length; i++) { %>
+                                              <% if(rules[i].code === rating.gameResult.rule) { %>
+                                                 <%= rules[i].name %>
+                                              <% } %>
+                                            <% } %>
+                                        </div>
+                                        <div class="col-2">
+                                            <h4 class="small fw-bold">
+                                                <% if (rating.isWinner) { %>
+                                                    <span style="color: var(--bs-red);">Win</span>
+                                                <% } else { %>
+                                                    <span style="color: var(--bs-green);">Lose...</span>
+                                                <% } %>
+                                            </h4>
+                                        </div>
+                                        <div class="col-2"><%= Math.floor(rating.muBefore) %></div>
+                                        <div class="col-2"><%= Math.floor(rating.muAfter) %></div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p>対戦結果はまだありません</p>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -26,8 +61,7 @@
             </footer>
         </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
+    <%- include('components/footer-scripts'); %>
 </body>
 
 </html>
