@@ -16,14 +16,14 @@
                         </div>
                         <div class="card-body">
                             <% if (ratings) { %>
-                                <div class="row">
-                                    <div class="col-3"></div>
-                                    <div class="col-3">R</div>
-                                    <div class="col-3">勝</div>
-                                    <div class="col-3">負</div>
+                                <div class="row my-1">
+                                    <div class="col-3">ルール</div>
+                                    <div class="col-3">現在のパワー</div>
+                                    <div class="col-3"><span class="text-win">Win</span></div>
+                                    <div class="col-3"><span class="text-lose">Lose...</span></div>
                                 </div>
                                 <% rules.forEach((rule) => {%> <% const rating = ratings.find(r => r.rule === rule.code) || null %>
-                                    <div class="row">
+                                    <div class="row my-1">
                                         <div class="col-3">
                                             <h4 class="small fw-bold"><%= rule.name %></h4>
                                         </div>

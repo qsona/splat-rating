@@ -16,7 +16,7 @@
                         </div>
                         <div class="card-body">
                             <% if (ratings) { %>
-                                <div class="row">
+                                <div class="row my-1">
                                     <div class="col-3">対戦日時</div>
                                     <div class="col-3">ルール</div>
                                     <div class="col-2">対戦結果</div>
@@ -24,7 +24,7 @@
                                     <div class="col-2">対戦後パワー</div>
                                 </div>
                                 <% ratings.forEach(function(rating) { %>
-                                    <div class="row">
+                                    <div class="row my-1">
                                         <div class="col-3"><%= rating.createdAt.getFullYear() + '/' + (rating.createdAt.getMonth() + 1) + '/' + rating.createdAt.getDate() + ' ' + ('0' + rating.createdAt.getHours()).slice(-2) + ':' + ('0' + rating.createdAt.getMinutes()).slice(-2) %></div>
                                         <div class="col-3">
                                             <!-- TODO: to forEach -->
@@ -37,9 +37,9 @@
                                         <div class="col-2">
                                             <h4 class="small fw-bold">
                                                 <% if (rating.isWinner) { %>
-                                                    <span style="color: var(--bs-red);">Win</span>
+                                                    <span class="text-win">Win</span>
                                                 <% } else { %>
-                                                    <span style="color: var(--bs-green);">Lose...</span>
+                                                    <span class="text-lose">Lose...</span>
                                                 <% } %>
                                             </h4>
                                         </div>
