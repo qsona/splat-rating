@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>user <%= user.name %> | splat-rating</title>
+  </head>
+  <body>
+    <p><%= user.name %></p>
+    <table>
+      <thead>
+        <td></td>
+        <td>R</td>
+        <td>勝</td>
+        <td>負</td>
+      </thead>
+      <% rules.forEach((rule) => {%> <% const rating = user.ratings.find(r => r.rule === rule.code) || null %>
+      <tr>
+        <td><%= rule.name %></td>
+        <td><%= rating && Math.floor(rating.mu)%></td>
+        <td><%= rating && rating.winCount%></td>
+        <td><%= rating && rating.loseCount%></td>
+      </tr>
+      <% }) %>
+    </table>
+  </body>
+</html>
