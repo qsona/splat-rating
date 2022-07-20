@@ -16,11 +16,25 @@ app.get('/', (req, res) => {
 })
 
 app.get('/test', (req, res) => {
-  res.render('test')
+  res.render('table')
 })
 
 app.get('/login', (req, res) => {
   res.render('login')
+})
+
+app.get('/dashboard/:id', async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+    include: { Rating: true },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  const ratings = await prisma.rating.findMany({
+    where : { userId : user.id }
+  })
+  res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.get('/profile/:id', async (req, res) => {
@@ -31,7 +45,22 @@ app.get('/profile/:id', async (req, res) => {
   if (!user) {
     return res.status(404).send('User Not Found')
   }
-  res.render('profile', { user, rules: SPLAT_RULES_NAME_MAP })
+  const ratings = await prisma.rating.findMany({
+    where : { userId : user.id }
+  })
+  res.render('profile', { user })
+})
+
+// TODO: showCount, pageId
+app.get('/history/:id', async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+    include: { Rating: true },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  res.render('history', { user })
 })
 
 app.get('/users', async (req, res) => {

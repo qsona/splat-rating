@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<%- include('components/head'); %>
+
+<body id="page-top">
+    <div id="wrapper">
+        <%- include('components/left-nav', { active: 'dashboard', user: user }); %>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <%- include('components/head-nav', { user: user }); %>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Dashboard</h3>
+                    <div class="card shadow mb-5">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Ratings</p>
+                        </div>
+                        <div class="card-body">
+                            <% if (ratings) { %>
+                                <div class="row">
+                                    <div class="col-3"></div>
+                                    <div class="col-3">R</div>
+                                    <div class="col-3">勝</div>
+                                    <div class="col-3">負</div>
+                                </div>
+                                <% rules.forEach((rule) => {%> <% const rating = ratings.find(r => r.rule === rule.code) || null %>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <h4 class="small fw-bold"><%= rule.name %></h4>
+                                        </div>
+                                        <div class="col-3"><%= rating && Math.floor(rating.mu) || '-' %></div>
+                                        <div class="col-3"><%= rating && rating.winCount || '-' %></div>
+                                        <div class="col-3"><%= rating && rating.loseCount || '-' %></div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p>対戦結果はまだありません</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Splat-Rating 2022</span></div>
+                </div>
+            </footer>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.min.js"></script>
+</body>
+
+</html>
