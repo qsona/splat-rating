@@ -15,6 +15,7 @@ app.use(bodyParser.json())
 
 app.set('view engine', 'ejs')
 app.use('/assets', express.static(__dirname + '/assets'))
+
 app.get('/', (req, res) => {
   res.render('index')
 })
@@ -111,28 +112,38 @@ app.get('/users/:id', async (req, res) => {
   res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
 })
 
+passport.use(
+  new DiscordStrategy(
+    {
+      clientID: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_PUBLIC_KEY,
+      callbackURL: process.env.DISCORD_CALLBACK_URL,
+      scope: ['identify'],
+    },
+    function () {}
+    // async (_accessToken: any, _refreshToken: any, profile: { id: string; username: string }, callback: (err: any, user: any) => void) => {
+    //   try {
+    //     console.log([_accessToken, _refreshToken, profile])
+    //     let user = await prisma.user.findUnique({ where: { id: profile.id } })
+    //     if (!user) {
+    //       user = await prisma.user.create({ data: { id: profile.id, name: profile.username } })
+    //     }
+    //     callback(null, user)
+    //   } catch (e) {
+    //     callback(e, null)
+    //   }
+    // }
+  )
+)
+
+app.get('/auth/discord', passport.authenticate('discord'));
+app.get('/auth/discord/callback', passport.authenticate('discord', {
+    failureRedirect: '/'
+}), function(req, res) {
+  console.log(req)
+  res.redirect('/dashboard')
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
-
-// passport.use(
-//   new DiscordStrategy(
-//     {
-//       clientID: 'id',
-//       clientSecret: 'secret',
-//       callbackURL: 'http://localhost:3000/auth/discord/callback',
-//       scope: ['identify'],
-//     },
-//     async (_accessToken: any, _refreshToken: any, profile: { id: string; username: string }, callback: (err: any, user: any) => void) => {
-//       try {
-//         let user = await prisma.user.findUnique({ where: { id: profile.id } })
-//         if (!user) {
-//           user = await prisma.user.create({ data: { id: profile.id, name: profile.username } })
-//         }
-//         callback(null, user)
-//       } catch (e) {
-//         callback(e, null)
-//       }
-//     }
-//   )
-// )
