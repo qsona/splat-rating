@@ -19,10 +19,10 @@
                                             <p class="text-primary m-0 fw-bold">User Settings</p>
                                         </div>
                                         <div class="card-body">
-                                            <form>
+                                            <form method="POST">
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="username"><strong>ユーザー名</strong></label><input class="form-control" type="text" id="username" placeholder="user.name" name="username" value="<%= user.name %>"></div>
+                                                        <div class="mb-3"><label class="form-label" for="name"><strong>ユーザー名</strong></label><input class="form-control" type="text" id="name" placeholder="ユーザー名" name="name" value="<%= user.name %>"></div>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit">保存</button></div>
