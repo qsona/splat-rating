@@ -22,7 +22,7 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
-    include: { ratings: true },
+    include: { Rating: true },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
