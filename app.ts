@@ -6,12 +6,54 @@ const bodyParser = require('body-parser')
 const DiscordStrategy = require('passport-discord').Strategy
 
 require('dotenv').config()
+const session = require('express-session');
 
 const app = express()
 const port = 3000
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
+app.use(session({
+  secret: process.env.SESSION_SECRET_KEY,
+  name: 'session',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    path: '/',
+    httpOnly: true,
+    maxAge: 10 * 1000,
+  },
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+
+const discordStrat = new DiscordStrategy(
+  {
+    clientID: process.env.DISCORD_CLIENT_ID,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    callbackURL: process.env.DISCORD_CALLBACK_URL,
+    scope: ['identify'],
+  },
+  async (_accessToken: string, _refreshToken: string, profile: { id: string; username: string }, callback: (err: any, user: any) => void ) => {
+    try {
+      console.log([_accessToken, _refreshToken, profile])
+      let user = prisma.user.findUnique({
+        where: {
+          id: profile.id
+        }
+      })
+      if (!user) {
+        user = prisma.user.create({ data: { id: profile.id, name: profile.username } })
+      }
+      console.log(user)
+      return callback(null, user)
+    } catch (e) {
+      return callback(e, null)
+    }
+  }
+)
+passport.use(discordStrat)
+
 
 app.set('view engine', 'ejs')
 app.use('/assets', express.static(__dirname + '/assets'))
@@ -112,37 +154,19 @@ app.get('/users/:id', async (req, res) => {
   res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
 })
 
-passport.use(
-  new DiscordStrategy(
-    {
-      clientID: process.env.DISCORD_CLIENT_ID,
-      clientSecret: process.env.DISCORD_PUBLIC_KEY,
-      callbackURL: process.env.DISCORD_CALLBACK_URL,
-      scope: ['identify'],
-    },
-    function () {}
-    // async (_accessToken: any, _refreshToken: any, profile: { id: string; username: string }, callback: (err: any, user: any) => void) => {
-    //   try {
-    //     console.log([_accessToken, _refreshToken, profile])
-    //     let user = await prisma.user.findUnique({ where: { id: profile.id } })
-    //     if (!user) {
-    //       user = await prisma.user.create({ data: { id: profile.id, name: profile.username } })
-    //     }
-    //     callback(null, user)
-    //   } catch (e) {
-    //     callback(e, null)
-    //   }
-    // }
-  )
-)
+app.get('/auth/discord', passport.authenticate('discord'))
 
-app.get('/auth/discord', passport.authenticate('discord'));
-app.get('/auth/discord/callback', passport.authenticate('discord', {
-    failureRedirect: '/'
-}), function(req, res) {
-  console.log(req)
-  res.redirect('/dashboard')
-});
+app.get('/auth/discord/callback', async (req, res) => {
+  console.log(req.session.userid)
+  res.send('test')
+})
+// app.get('/auth/discord/callback', passport.authenticate('discord', {
+//     successRedirect: '/dashboard',
+//     failureRedirect: '/'
+// }), function(req, res) {
+//   console.log(req)
+//   res.redirect('/test')
+// })
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
