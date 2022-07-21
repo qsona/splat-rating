@@ -21,7 +21,7 @@ app.use(session({
   cookie: {
     path: '/',
     httpOnly: true,
-    maxAge: 10 * 1000,
+    maxAge: 60 * 60 * 1000,
   },
 }))
 app.use(passport.initialize());
@@ -59,7 +59,7 @@ app.set('view engine', 'ejs')
 app.use('/assets', express.static(__dirname + '/assets'))
 
 app.get('/', (req, res) => {
-  res.render('index')
+  res.redirect('/dashboard')
 })
 
 app.get('/test', isAuthenticated, (req, res) => {
@@ -75,9 +75,9 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
-  const currentUser = <Profile>req.user
+  const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
-    where: { id: currentUser.id },
+    where: { id: loginUser.id },
     include: { Rating: true },
   })
   if (!user) {
@@ -89,24 +89,10 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
   res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
-// TODO: to admin menu
-// app.get('/dashboard/:id', isAuthenticated, async (req, res) => {
-//   const user = await prisma.user.findUnique({
-//     where: { id: req.params.id },
-//     include: { Rating: true },
-//   })
-//   if (!user) {
-//     return res.status(404).send('User Not Found')
-//   }
-//   const ratings = await prisma.rating.findMany({
-//     where : { userId : user.id }
-//   })
-//   res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
-// })
-
-app.get('/profile/:id', isAuthenticated, async (req, res) => {
+app.get('/profile', isAuthenticated, async (req, res) => {
+  const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
+    where: { id: loginUser.id },
     include: { Rating: true },
   })
   if (!user) {
@@ -115,21 +101,18 @@ app.get('/profile/:id', isAuthenticated, async (req, res) => {
   res.render('profile', { user })
 })
 
-app.post('/profile/:id', isAuthenticated, async (req, res) => {
+app.post('/profile', isAuthenticated, async (req, res) => {
+  const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
+    where: { id: loginUser.id },
     include: { Rating: true },
   })
-  // TODO: check current login user === id user
-  if (!user) {
-    return res.status(404).send('User Not Found')
-  }
 
   const newName = req.body.name
   // TODO: do validate & csrf token check
   const result = await prisma.user.update({
     where: {
-      id: user.id
+      id: loginUser.id
     },
     data: {
       name: newName,
@@ -138,13 +121,14 @@ app.post('/profile/:id', isAuthenticated, async (req, res) => {
   if (result.name !== newName) {
     return res.status(500).send('User Data update failed...')
   }
-  res.redirect('/profile/' + user.id)
+  res.redirect('/profile')
 })
 
 // TODO: showCount, pageId
-app.get('/history/:id', isAuthenticated, async (req, res) => {
+app.get('/history', isAuthenticated, async (req, res) => {
+  const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
+    where: { id: loginUser.id },
     include: { Rating: true },
   })
   if (!user) {
@@ -174,7 +158,7 @@ app.get('/users/:id', isAuthenticated, async (req, res) => {
   res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
 })
 
-const discordStrat = new DiscordStrategy(
+passport.use(new DiscordStrategy(
   {
     clientID: process.env.DISCORD_CLIENT_ID,
     clientSecret: process.env.DISCORD_CLIENT_SECRET,
@@ -200,14 +184,13 @@ const discordStrat = new DiscordStrategy(
       return callback(e, null)
     }
   }
-)
-passport.use(discordStrat)
+))
+
 passport.serializeUser((user, done) => {
   console.log(['serializeUser', user])
   done(null, user);
 });
-// passport.deserializeUser((user: Express.User, done) => {
-passport.deserializeUser((user: { id: string, name: string}, done) => {
+passport.deserializeUser((user: Express.User, done) => {
   console.log(['deserializeUser', user])
   done(null, user);
 });
