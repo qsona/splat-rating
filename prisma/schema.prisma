@@ -40,6 +40,8 @@ model JoinedUser {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  ratingId  String
+  rating    Rating   @relation(fields: [ratingId], references: [id])
   roomId    String
   room      Room     @relation(fields: [roomId], references: [id])
   createdAt DateTime @default(now())
@@ -54,12 +56,15 @@ model Rating {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   rule      String
+  guildId   String
   winCount  Int      @default(0)
   loseCount Int      @default(0)
   createdAt DateTime @default(now())
 
   GameResultRating GameResultRating[]
-  @@unique([userId, rule])
+  JoinedUser       JoinedUser[]
+
+  @@unique([userId, guildId, rule])
 }
 
 model GameResult {

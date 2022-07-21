@@ -7,6 +7,13 @@ import { getUserFromMentionable } from './helpers/mentionable'
 const handler: CommandHandler = {
   commandName: 'sr-make-register',
   execute: async (interaction) => {
+    const { guildId, guild } = interaction
+    if (!guildId) {
+      console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
+      await interaction.reply('guildId が存在しません。管理者にご連絡ください。')
+      return
+    }
+
     const mentionable = interaction.options.getMentionable('user')!
     const user = getUserFromMentionable(mentionable)
     if (!user) {
@@ -22,9 +29,9 @@ const handler: CommandHandler = {
     const name = username
 
     // register rating
-    const result = await registerUserAndRating(id, username, rule, gachipower)
+    const result = await registerUserAndRating(id, username, guildId, rule, gachipower)
     if (result === 'RATING_ALREADY_REGISTERED') {
-      await interaction.reply(`ユーザー ${name} の ${rulename} のレーティングはすでに登録されています。`)
+      await interaction.reply(`${guild?.name} において  ユーザー ${name} の ${rulename} のレーティングはすでに登録されています。`)
       return
     }
 
