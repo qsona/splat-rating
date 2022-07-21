@@ -7,12 +7,12 @@ const DiscordStrategy = require('passport-discord').Strategy
 
 require('dotenv').config()
 const session = require('express-session');
-
 const app = express()
 const port = 3000
 
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+
 app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   name: 'session',
@@ -24,36 +24,36 @@ app.use(session({
     maxAge: 10 * 1000,
   },
 }))
-app.use(passport.initialize())
+app.use(passport.initialize());
 app.use(passport.session())
 
-const discordStrat = new DiscordStrategy(
-  {
-    clientID: process.env.DISCORD_CLIENT_ID,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET,
-    callbackURL: process.env.DISCORD_CALLBACK_URL,
-    scope: ['identify'],
-  },
-  async (_accessToken: string, _refreshToken: string, profile: { id: string; username: string }, callback: (err: any, user: any) => void ) => {
-    try {
-      console.log([_accessToken, _refreshToken, profile])
-      let user = prisma.user.findUnique({
-        where: {
-          id: profile.id
-        }
-      })
-      if (!user) {
-        user = prisma.user.create({ data: { id: profile.id, name: profile.username } })
-      }
-      console.log(user)
-      return callback(null, user)
-    } catch (e) {
-      return callback(e, null)
-    }
+const isAuthenticated = (req: any, res: any, next: any) => {
+  console.log('isAuthenticated')
+  console.log([req.isAuthenticated(), req.user])
+  if (req.isAuthenticated() && req.user) {
+    next()
+  } else {
+    res.redirect('/login');
   }
-)
-passport.use(discordStrat)
-
+};
+// TODO: move to class file
+export type Profile = {
+  id: string
+  username: string
+  avatar: string
+  avatar_decoration: string
+  discriminator: string
+  public_flags: number
+  flags: number
+  banner: string
+  banner_color: string
+  accent_color: string
+  locale: string
+  mfa_enabled: boolean
+  provider: string
+  accessToken: string
+  fetchedAt: Date
+}
 
 app.set('view engine', 'ejs')
 app.use('/assets', express.static(__dirname + '/assets'))
@@ -62,17 +62,22 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.get('/test', (req, res) => {
+app.get('/test', isAuthenticated, (req, res) => {
   res.render('table')
 })
 
 app.get('/login', (req, res) => {
   res.render('login')
 })
+app.get('/logout', (req, res) => {
+  req.logout()
+  res.redirect('/login')
+});
 
-app.get('/dashboard/:id', async (req, res) => {
+app.get('/dashboard', isAuthenticated, async (req, res) => {
+  const currentUser = <Profile>req.user
   const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
+    where: { id: currentUser.id },
     include: { Rating: true },
   })
   if (!user) {
@@ -84,7 +89,22 @@ app.get('/dashboard/:id', async (req, res) => {
   res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
-app.get('/profile/:id', async (req, res) => {
+// TODO: to admin menu
+// app.get('/dashboard/:id', isAuthenticated, async (req, res) => {
+//   const user = await prisma.user.findUnique({
+//     where: { id: req.params.id },
+//     include: { Rating: true },
+//   })
+//   if (!user) {
+//     return res.status(404).send('User Not Found')
+//   }
+//   const ratings = await prisma.rating.findMany({
+//     where : { userId : user.id }
+//   })
+//   res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
+// })
+
+app.get('/profile/:id', isAuthenticated, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: { Rating: true },
@@ -95,7 +115,7 @@ app.get('/profile/:id', async (req, res) => {
   res.render('profile', { user })
 })
 
-app.post('/profile/:id', async (req, res) => {
+app.post('/profile/:id', isAuthenticated, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: { Rating: true },
@@ -122,7 +142,7 @@ app.post('/profile/:id', async (req, res) => {
 })
 
 // TODO: showCount, pageId
-app.get('/history/:id', async (req, res) => {
+app.get('/history/:id', isAuthenticated, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: { Rating: true },
@@ -138,12 +158,12 @@ app.get('/history/:id', async (req, res) => {
   res.render('history', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
-app.get('/users', async (req, res) => {
+app.get('/users', isAuthenticated, async (req, res) => {
   const users = await prisma.user.findMany()
   res.render('users', { users })
 })
 
-app.get('/users/:id', async (req, res) => {
+app.get('/users/:id', isAuthenticated, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: { Rating: true },
@@ -154,20 +174,50 @@ app.get('/users/:id', async (req, res) => {
   res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
 })
 
-app.get('/auth/discord', passport.authenticate('discord'))
+const discordStrat = new DiscordStrategy(
+  {
+    clientID: process.env.DISCORD_CLIENT_ID,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    callbackURL: process.env.DISCORD_CALLBACK_URL,
+    scope: ['identify'],
+  },
+  async (_accessToken: string, _refreshToken: string, profile: { id: string; username: string }, callback: (err: any, user: any) => void ) => {
+    try {
+      console.log([_accessToken, _refreshToken, profile])
+      let user = prisma.user.findUnique({
+        where: {
+          id: profile.id
+        }
+      })
+      if (!user) {
+        user = prisma.user.create({ data: { id: profile.id, name: profile.username } })
+        if (!user) {
+          throw new Error('Cannot create user exception')
+        }
+      }
+      return callback(null, profile)
+    } catch (e) {
+      return callback(e, null)
+    }
+  }
+)
+passport.use(discordStrat)
+passport.serializeUser((user, done) => {
+  console.log(['serializeUser', user])
+  done(null, user);
+});
+// passport.deserializeUser((user: Express.User, done) => {
+passport.deserializeUser((user: { id: string, name: string}, done) => {
+  console.log(['deserializeUser', user])
+  done(null, user);
+});
 
-app.get('/auth/discord/callback', async (req, res) => {
-  console.log(req.session.userid)
-  res.send('test')
-})
-// app.get('/auth/discord/callback', passport.authenticate('discord', {
-//     successRedirect: '/dashboard',
-//     failureRedirect: '/'
-// }), function(req, res) {
-//   console.log(req)
-//   res.redirect('/test')
-// })
+app.get('/auth/discord', passport.authenticate('discord'))
+app.get('/auth/discord/callback', passport.authenticate('discord', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/login'
+}))
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`app listening at http://localhost:${port}`)
 })

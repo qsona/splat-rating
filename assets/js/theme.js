@@ -72,5 +72,14 @@
       }
     });
   }
-  document.getElementById('sidebarToggleTop').dispatchEvent(new Event('click'));
+  const sidebarToggleTop = document.getElementById('sidebarToggleTop');
+  if (sidebarToggleTop) {
+    sidebarToggleTop.dispatchEvent(new Event('click'));
+  }
+  const btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) {
+    btnLogin.onclick = function () {
+      location.href = '/auth/discord';
+    };
+  }
 })(); // End of use strict
