@@ -4,10 +4,10 @@
 
 <body id="page-top">
     <div id="wrapper">
-        <%- include('components/left-nav', { active: 'profile', user: user }); %>
+        <%- include('components/left-nav', { active: 'profile', loginUser: loginUser }); %>
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
-                <%- include('components/head-nav', { user: user }); %>
+                <%- include('components/head-nav', { loginUser: loginUser }); %>
                 <div class="container-fluid">
                     <h3 class="text-dark mb-4">Profile</h3>
                     <div class="row mb-3">
@@ -35,11 +35,7 @@
                     </div>
                 </div>
             </div>
-            <footer class="bg-white sticky-footer">
-                <div class="container my-auto">
-                    <div class="text-center my-auto copyright"><span>Copyright © Splat-Rating 2022</span></div>
-                </div>
-            </footer>
+            <%- include('components/footer'); %>
         </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
     </div>
     <%- include('components/footer-scripts'); %>

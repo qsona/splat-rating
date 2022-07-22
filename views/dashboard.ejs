@@ -4,12 +4,12 @@
 
 <body id="page-top">
     <div id="wrapper">
-        <%- include('components/left-nav', { active: 'dashboard', user: user }); %>
+        <%- include('components/left-nav', { active: 'dashboard', loginUser: loginUser }); %>
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
-                <%- include('components/head-nav', { user: user }); %>
+                <%- include('components/head-nav', { loginUser: loginUser }); %>
                 <div class="container-fluid">
-                    <h3 class="text-dark mb-4">Dashboard</h3>
+                    <h3 class="text-dark mb-4">Dashboard (<%= user.name %>)</h3>
                     <div class="card shadow mb-5">
                         <div class="card-header py-3">
                             <p class="text-primary m-0 fw-bold">Ratings</p>
@@ -58,11 +58,7 @@
                     <% }) %>
                 </div>
             </div>
-            <footer class="bg-white sticky-footer">
-                <div class="container my-auto">
-                    <div class="text-center my-auto copyright"><span>Copyright © Splat-Rating 2022</span></div>
-                </div>
-            </footer>
+            <%- include('components/footer'); %>
         </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
     </div>
     <%- include('components/footer-scripts'); %>

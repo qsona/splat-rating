@@ -11,6 +11,10 @@ require('dotenv').config()
 const session = require('express-session');
 const app = express()
 const port = 3000
+const ADMIN_IDS = [
+  '535814780787884073',
+  '928994301373976607'
+]
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -30,8 +34,6 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 const isAuthenticated = (req: any, res: any, next: any) => {
-  console.log('isAuthenticated')
-  console.log([req.isAuthenticated(), req.user])
   if (req.isAuthenticated() && req.user) {
     next()
   } else {
@@ -39,10 +41,6 @@ const isAuthenticated = (req: any, res: any, next: any) => {
   }
 }
 const isAdmin = (req: any) => {
-  console.log('isAdmin')
-  const ADMIN_IDS = [
-    '928994301373976607'
-  ]
   return ADMIN_IDS.indexOf(req.user.id) !== -1
 }
 
@@ -66,10 +64,120 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
-  // const loginUser = { id: '928994301373976607' }
-  const loginUser = <Profile>req.user
+  const profile = <Profile>req.user
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  const ratings = await prisma.rating.findMany({
+    where : { userId : loginUser.id }
+  })
+
+  const gameResultRatings = await prisma.gameResultRating.findMany({
+    where: { userId: loginUser.id},
+    orderBy: { createdAt: 'asc'},
+    include: { gameResult: true }
+  })
+  let rulesRatingMap = new Map()
+  SPLAT_RULES_NAME_MAP.forEach(function (rule) {
+    // do clone without npm clone module
+    rulesRatingMap.set(rule.code, JSON.parse(JSON.stringify(Template)))
+  });
+  if (gameResultRatings) {
+    gameResultRatings.forEach(function (gameResultRating) {
+      let templateData = rulesRatingMap.get(gameResultRating.gameResult.rule)
+      const formattedCreatedAt = (gameResultRating.createdAt.getMonth() + 1) + '/' + gameResultRating.createdAt.getDate() + ' ' + ('0' + gameResultRating.createdAt.getHours()).slice(-2) + ':' + ('0' + gameResultRating.createdAt.getMinutes()).slice(-2)
+      templateData.data.labels.push(formattedCreatedAt)
+      templateData.data.datasets[0].data.push(Math.floor(gameResultRating.muAfter))
+    })
+  }
+  res.render('dashboard', { loginUser, user: loginUser, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
+})
+
+app.get('/profile', isAuthenticated, async (req, res) => {
+  const profile = <Profile>req.user
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  res.render('profile', { loginUser, user: loginUser, isAdmin: isAdmin(req) })
+})
+
+app.post('/profile', isAuthenticated, async (req, res) => {
+  const profile = <Profile>req.user
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
+
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  
+  const newName = req.body.name
+  // TODO: do validate & csrf token check
+  const result = await prisma.user.update({
+    where: {
+      id: profile.id
+    },
+    data: {
+      name: newName,
+    }
+  })
+  if (result.name !== newName) {
+    return res.status(500).send('User Data update failed...')
+  }
+  res.redirect('/profile')
+})
+
+// TODO: showCount, pageId
+app.get('/history', isAuthenticated, async (req, res) => {
+  const profile = <Profile>req.user
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  const ratings = await prisma.gameResultRating.findMany({
+    where: { userId: loginUser.id },
+    orderBy: { createdAt: 'desc'},
+    include: { gameResult: true }
+  })
+  res.render('history', { loginUser, isAdmin: isAdmin(req), ratings, rules: SPLAT_RULES_NAME_MAP })
+})
+
+app.get('/admin/users', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
+  }
+  const profile = <Profile>req.user
+
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+    include: { Rating: true },
+  })
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  const users = await prisma.user.findMany()
+  res.render('admin/users', { loginUser, users, isAdmin: isAdmin(req) })
+})
+
+app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
+  }
+  const profile = <Profile>req.user
+  
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
   const user = await prisma.user.findUnique({
-    where: { id: loginUser.id },
+    where: { id: req.params.id },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
@@ -96,79 +204,7 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
       templateData.data.datasets[0].data.push(Math.floor(gameResultRating.muAfter))
     })
   }
-  res.render('dashboard', { user, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
-})
-
-app.get('/profile', isAuthenticated, async (req, res) => {
-  const loginUser = <Profile>req.user
-  const user = await prisma.user.findUnique({
-    where: { id: loginUser.id },
-  })
-  if (!user) {
-    return res.status(404).send('User Not Found')
-  }
-  res.render('profile', { user, isAdmin: isAdmin(req) })
-})
-
-app.post('/profile', isAuthenticated, async (req, res) => {
-  const loginUser = <Profile>req.user
-  const user = await prisma.user.findUnique({
-    where: { id: loginUser.id },
-  })
-
-  const newName = req.body.name
-  // TODO: do validate & csrf token check
-  const result = await prisma.user.update({
-    where: {
-      id: loginUser.id
-    },
-    data: {
-      name: newName,
-    }
-  })
-  if (result.name !== newName) {
-    return res.status(500).send('User Data update failed...')
-  }
-  res.redirect('/profile')
-})
-
-// TODO: showCount, pageId
-app.get('/history', isAuthenticated, async (req, res) => {
-  const loginUser = <Profile>req.user
-  const user = await prisma.user.findUnique({
-    where: { id: loginUser.id },
-  })
-  if (!user) {
-    return res.status(404).send('User Not Found')
-  }
-  const ratings = await prisma.gameResultRating.findMany({
-    where: { userId: user.id},
-    orderBy: { createdAt: 'desc'},
-    include: { gameResult: true }
-  })
-  res.render('history', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
-})
-
-app.get('/admin/users', isAuthenticated, async (req, res) => {
-  if (!isAdmin(req)) {
-    return res.redirect('/dashboard')
-  }
-  const users = await prisma.user.findMany()
-  res.render('users', { users, isAdmin: isAdmin(req) })
-})
-
-app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
-  if (!isAdmin(req)) {
-    return res.redirect('/dashboard')
-  }
-  const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
-    include: { Rating: true },
-  })
-  if (!user) {
-    return res.status(404).send('User Not Found')
-  }
-  res.render('user', { user, isAdmin: isAdmin(req), rules: SPLAT_RULES_NAME_MAP })
+  res.render('dashboard', { loginUser, user, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
 })
 
 passport.use(new DiscordStrategy(
@@ -200,11 +236,9 @@ passport.use(new DiscordStrategy(
 ))
 
 passport.serializeUser((user, done) => {
-  console.log(['serializeUser', user])
   done(null, user);
 });
 passport.deserializeUser((user: Express.User, done) => {
-  console.log(['deserializeUser', user])
   done(null, user);
 });
 
