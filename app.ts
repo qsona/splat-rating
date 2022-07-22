@@ -4,6 +4,8 @@ import { prisma } from './src/prismaClient'
 import { SPLAT_RULES_NAME_MAP } from './src/rules'
 const bodyParser = require('body-parser')
 const DiscordStrategy = require('passport-discord').Strategy
+import { Template } from './src/models/graphData'
+import { Profile } from './src/models/profile'
 
 require('dotenv').config()
 const session = require('express-session');
@@ -35,24 +37,13 @@ const isAuthenticated = (req: any, res: any, next: any) => {
   } else {
     res.redirect('/login');
   }
-};
-// TODO: move to class file
-export type Profile = {
-  id: string
-  username: string
-  avatar: string
-  avatar_decoration: string
-  discriminator: string
-  public_flags: number
-  flags: number
-  banner: string
-  banner_color: string
-  accent_color: string
-  locale: string
-  mfa_enabled: boolean
-  provider: string
-  accessToken: string
-  fetchedAt: Date
+}
+const isAdmin = (req: any) => {
+  console.log('isAdmin')
+  const ADMIN_IDS = [
+    '928994301373976607'
+  ]
+  return ADMIN_IDS.indexOf(req.user.id) !== -1
 }
 
 app.set('view engine', 'ejs')
@@ -63,7 +54,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/test', isAuthenticated, (req, res) => {
-  res.render('table')
+  res.render('test')
 })
 
 app.get('/login', (req, res) => {
@@ -75,10 +66,10 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
+  // const loginUser = { id: '928994301373976607' }
   const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
     where: { id: loginUser.id },
-    include: { Rating: true },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
@@ -86,26 +77,43 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
   const ratings = await prisma.rating.findMany({
     where : { userId : user.id }
   })
-  res.render('dashboard', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
+
+  const gameResultRatings = await prisma.gameResultRating.findMany({
+    where: { userId: user.id},
+    orderBy: { createdAt: 'asc'},
+    include: { gameResult: true }
+  })
+  let rulesRatingMap = new Map()
+  SPLAT_RULES_NAME_MAP.forEach(function (rule) {
+    // do clone without npm clone module
+    rulesRatingMap.set(rule.code, JSON.parse(JSON.stringify(Template)))
+  });
+  if (gameResultRatings) {
+    gameResultRatings.forEach(function (gameResultRating) {
+      let templateData = rulesRatingMap.get(gameResultRating.gameResult.rule)
+      const formattedCreatedAt = (gameResultRating.createdAt.getMonth() + 1) + '/' + gameResultRating.createdAt.getDate() + ' ' + ('0' + gameResultRating.createdAt.getHours()).slice(-2) + ':' + ('0' + gameResultRating.createdAt.getMinutes()).slice(-2)
+      templateData.data.labels.push(formattedCreatedAt)
+      templateData.data.datasets[0].data.push(Math.floor(gameResultRating.muAfter))
+    })
+  }
+  res.render('dashboard', { user, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.get('/profile', isAuthenticated, async (req, res) => {
   const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
     where: { id: loginUser.id },
-    include: { Rating: true },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
   }
-  res.render('profile', { user })
+  res.render('profile', { user, isAdmin: isAdmin(req) })
 })
 
 app.post('/profile', isAuthenticated, async (req, res) => {
   const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
     where: { id: loginUser.id },
-    include: { Rating: true },
   })
 
   const newName = req.body.name
@@ -129,7 +137,6 @@ app.get('/history', isAuthenticated, async (req, res) => {
   const loginUser = <Profile>req.user
   const user = await prisma.user.findUnique({
     where: { id: loginUser.id },
-    include: { Rating: true },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
@@ -142,12 +149,18 @@ app.get('/history', isAuthenticated, async (req, res) => {
   res.render('history', { user, ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
-app.get('/users', isAuthenticated, async (req, res) => {
+app.get('/admin/users', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
+  }
   const users = await prisma.user.findMany()
-  res.render('users', { users })
+  res.render('users', { users, isAdmin: isAdmin(req) })
 })
 
-app.get('/users/:id', isAuthenticated, async (req, res) => {
+app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
+  }
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: { Rating: true },
@@ -155,7 +168,7 @@ app.get('/users/:id', isAuthenticated, async (req, res) => {
   if (!user) {
     return res.status(404).send('User Not Found')
   }
-  res.render('user', { user, rules: SPLAT_RULES_NAME_MAP })
+  res.render('user', { user, isAdmin: isAdmin(req), rules: SPLAT_RULES_NAME_MAP })
 })
 
 passport.use(new DiscordStrategy(
