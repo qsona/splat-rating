@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node ./app.ts",
     "bot": "ts-node ./bot.ts",
     "predeploy": "prisma migrate deploy",
     "repl": "ts-node ./repl.ts",

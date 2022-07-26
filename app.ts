@@ -17,7 +17,7 @@ app.use(express.json())
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET_KEY || '', // TODO
+    secret: process.env.SESSION_SECRET_KEY || 'a', // TODO
     name: 'session',
     resave: false,
     saveUninitialized: true,
@@ -224,8 +224,8 @@ app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
 passport.use(
   new DiscordStrategy(
     {
-      clientID: process.env.DISCORD_CLIENT_ID || '', // TODO
-      clientSecret: process.env.DISCORD_CLIENT_SECRET || '', // TODO
+      clientID: process.env.DISCORD_CLIENT_ID || 'a', // TODO
+      clientSecret: process.env.DISCORD_CLIENT_SECRET || 'a', // TODO
       callbackURL: process.env.DISCORD_CALLBACK_URL,
       scope: ['identify'],
     },
@@ -270,3 +270,6 @@ app.get(
 app.listen(port, () => {
   console.log(`app listening at http://localhost:${port}`)
 })
+
+// launch bot
+require('./bot')
