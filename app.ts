@@ -9,7 +9,7 @@ import { Profile } from './src/models/profile'
 require('dotenv').config()
 import session from 'express-session'
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 const ADMIN_IDS = ['535814780787884073', '928994301373976607']
 
 app.use(express.urlencoded({ extended: true }))
