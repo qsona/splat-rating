@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <%- include('components/head'); %>
+  <body>
+    <p><%= user.name %></p>
+    <% if (user.ratings) { %>
+      <table>
+        <thead>
+          <td></td>
+          <td>R</td>
+          <td>勝</td>
+          <td>負</td>
+        </thead>
+        <% rules.forEach((rule) => {%> <% const rating = user.ratings.find(r => r.rule === rule.code) || null %>
+        <tr>
+          <td><%= rule.name %></td>
+          <td><%= rating && Math.floor(rating.mu)%></td>
+          <td><%= rating && rating.winCount%></td>
+          <td><%= rating && rating.loseCount%></td>
+        </tr>
+        <% }) %>
+      </table>
+    <% } else { %>
+      <p>対戦結果はまだありません</p>
+    <% } %>
+    <%- include('components/footer-scripts'); %>
+  </body>
+</html>

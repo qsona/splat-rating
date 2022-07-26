@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<%- include('../components/head'); %>
+
+<body id="page-top">
+    <div id="wrapper">
+        <%- include('../components/left-nav', { active: 'profile', loginUser: loginUser }); %>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <%- include('../components/head-nav', { loginUser: loginUser }); %>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Users</h3>
+                    <div class="row mb-3">
+                        <div class="col-mb-12">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card shadow mb-3">
+                                        <div class="card-body">
+                                            <% users.forEach((user) => {%>
+                                                <div class="row my-1">
+                                                    <div class="col-12">
+                                                        <a href="/admin/user/<%= user.id %>"><%= user.name %></a>
+                                                    </div>
+                                                </div>
+                                            <% }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include('../components/footer'); %>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <%- include('../components/footer-scripts'); %>
+</body>
+
+</html>

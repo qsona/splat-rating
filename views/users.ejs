@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <%- include('components/head'); %>
+  <body>
+    <table>
+      <thead>
+        <td>名前</td>
+      </thead>
+      <% users.forEach((user) => {%>
+      <tr>
+        <td>
+          <a href="/users/<%= user.id %>"><%= user.name %></a>
+        </td>
+      </tr>
+      <% }) %>
+    </table>
+    <%- include('components/footer-scripts'); %>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<%- include('components/head'); %>
+
+<body id="page-top">
+    <div id="wrapper">
+        <%- include('components/left-nav', { active: 'dashboard', loginUser: loginUser }); %>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <%- include('components/head-nav', { loginUser: loginUser }); %>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Dashboard (<%= user.name %>)</h3>
+                    <div class="card shadow mb-5">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Ratings</p>
+                        </div>
+                        <div class="card-body">
+                            <% if (ratings) { %>
+                                <div class="row my-1">
+                                    <div class="col-3">ルール</div>
+                                    <div class="col-3">現在のパワー</div>
+                                    <div class="col-3"><span class="text-win">Win</span></div>
+                                    <div class="col-3"><span class="text-lose">Lose...</span></div>
+                                </div>
+                                <% rules.forEach((rule) => {%> <% const rating = ratings.find(r => r.rule === rule.code) || null %>
+                                    <div class="row my-1">
+                                        <div class="col-3">
+                                            <h4 class="small fw-bold"><%= rule.name %></h4>
+                                        </div>
+                                        <div class="col-3"><%= rating && Math.floor(rating.mu) || '-' %></div>
+                                        <div class="col-3"><%= rating && rating.winCount || '-' %></div>
+                                        <div class="col-3"><%= rating && rating.loseCount || '-' %></div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p>対戦結果はまだありません</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% rulesRatingMap.forEach((value, key) => { %>
+                        <% if (0 < value.data.labels.length) { %>
+                            <div class="row">
+                                <div class="col-12">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="text-primary fw-bold m-0">
+                                            <% rules.forEach((rule) => { %> <%= rule.code === key ? rule.name : '' %> <% }) %>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-area"><canvas
+                                            data-bss-chart="<%= JSON.stringify(value) %>"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }) %>
+                </div>
+            </div>
+            <%- include('components/footer'); %>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <%- include('components/footer-scripts'); %>
+</body>
+
+</html>

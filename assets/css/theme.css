@@ -1,0 +1,6 @@
+.text-win {
+    color: var(--bs-red);
+}
+.text-lose {
+    color: var(--bs-green);
+}
