@@ -1,2 +1,2 @@
 release: npm run predeploy
-bot: npm run bot
+web: npm start
