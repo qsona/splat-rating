@@ -164,7 +164,6 @@ app.get('/admin/users', isAuthenticated, async (req, res) => {
 
   const loginUser = await prisma.user.findUnique({
     where: { id: profile.id },
-    include: { Rating: true },
   })
   if (!loginUser) {
     return res.status(404).send('User Not Found')
