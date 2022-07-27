@@ -1,5 +1,6 @@
-import { CommandHandler } from '../../bot'
 import assert from 'assert'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
+import { CommandHandler } from '../../bot'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectRating } from '../inspectors'
@@ -38,7 +39,9 @@ const handler: CommandHandler = {
       messages.push('ホストは `/sr-match` でチーム分けしてください')
     }
 
-    await interaction.reply(messages.join('\n'))
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('join').setLabel('参加').setStyle(ButtonStyle.Primary))
+
+    await interaction.reply({ content: messages.join('\n'), components: [row] })
   },
 }
 
