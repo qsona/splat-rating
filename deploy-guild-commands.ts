@@ -7,7 +7,7 @@ import { SPLAT_RULES_NAME_MAP } from './src/rules'
 
 const token = process.env.DISCORD_TOKEN
 const guildId = process.env.GUILD_ID
-const clientId = process.env.CLIENT_ID
+const clientId = process.env.DISCORD_CLIENT_ID
 if (!token || !guildId || !clientId) {
   throw new Error('Some environment variables are not set')
 }

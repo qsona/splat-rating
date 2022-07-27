@@ -220,12 +220,16 @@ app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
   res.render('dashboard', { loginUser, user, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
 })
 
+const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URL } = process.env
+if (!DISCORD_CLIENT_ID) throw new Error('DISCORD_CLIENT_ID is not set')
+if (!DISCORD_CLIENT_SECRET) throw new Error('DISCORD_CLIENT_SECRET is not set')
+
 passport.use(
   new DiscordStrategy(
     {
-      clientID: process.env.DISCORD_CLIENT_ID || 'a', // TODO
-      clientSecret: process.env.DISCORD_CLIENT_SECRET || 'a', // TODO
-      callbackURL: process.env.DISCORD_CALLBACK_URL,
+      clientID: DISCORD_CLIENT_ID,
+      clientSecret: DISCORD_CLIENT_SECRET,
+      callbackURL: DISCORD_CALLBACK_URL,
       scope: ['identify'],
     },
     async (_accessToken: string, _refreshToken: string, profile: { id: string; username: string }, callback: (err: any, user: any) => void) => {
