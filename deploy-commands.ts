@@ -1,8 +1,8 @@
 require('dotenv').config()
 
-import { SlashCommandBuilder } from '@discordjs/builders'
+import { SlashCommandBuilder } from 'discord.js'
 import { REST } from '@discordjs/rest'
-import { Routes } from 'discord-api-types/v9'
+import { Routes } from 'discord-api-types/v10'
 import { SPLAT_RULES_NAME_MAP } from './src/rules'
 
 const token = process.env.DISCORD_TOKEN
@@ -21,7 +21,7 @@ const commands = [
       option
         .setName('rule')
         .setDescription('ルール種別')
-        .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
+        .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
         .setRequired(true)
     )
     .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
@@ -33,7 +33,7 @@ const commands = [
       option
         .setName('rule')
         .setDescription('ルール種別')
-        .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
+        .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
         .setRequired(true)
     ),
   new SlashCommandBuilder().setName('sr-join').setDescription('ゲームに参加する'),
@@ -48,11 +48,7 @@ const commands = [
       option
         .setName('result')
         .setDescription('勝敗')
-        .addChoices([
-          ['win', 'win'],
-          ['lose', 'lose'],
-          ['cancel', 'cancel'],
-        ])
+        .addChoices({ name: 'win', value: 'win' }, { name: 'lose', value: 'lose' }, { name: 'cancel', value: 'cancel' })
         .setRequired(true)
     ),
   new SlashCommandBuilder()
@@ -62,7 +58,7 @@ const commands = [
       option
         .setName('rule')
         .setDescription('ルール種別')
-        .addChoices(SPLAT_RULES_NAME_MAP.map(({ code, name }) => [name, code]))
+        .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
         .setRequired(true)
     )
     .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
