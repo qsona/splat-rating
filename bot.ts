@@ -14,6 +14,8 @@ import makeLeaveHandler from './src/commands/make-leave'
 import displayHandler from './src/commands/display'
 import pingHandler from './src/commands/ping'
 
+import { execute as executeButtonHandlers } from './src/commands/buttonHandlers'
+
 require('dotenv').config()
 
 const token = process.env.DISCORD_TOKEN
@@ -67,16 +69,20 @@ const helpHandler: CommandHandler = {
 
 client.on('interactionCreate', async (interaction) => {
   // if (interaction.type !== InteractionType.ApplicationCommand) {
-  if (!interaction.isChatInputCommand()) {
+  if (interaction.isChatInputCommand()) {
+    const { commandName } = interaction
+    console.log(commandName)
+    console.log(interaction.user)
+
+    const handler = handlers.get(commandName)
+    if (handler) {
+      await handler.execute(interaction)
+    }
     return
   }
 
-  const { commandName } = interaction
-  console.log(commandName)
-  console.log(interaction.user)
-
-  const handler = handlers.get(commandName)
-  if (handler) {
-    handler.execute(interaction)
+  if (interaction.isButton()) {
+    await executeButtonHandlers(interaction)
+    return
   }
 })
