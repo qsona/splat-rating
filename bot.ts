@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-import { Client, Intents, CommandInteraction } from 'discord.js'
+import { Client, GatewayIntentBits, CommandInteraction, InteractionType, Interaction, ChatInputCommandInteraction } from 'discord.js'
 
 import registerHandler from './src/commands/register'
 import newgameHandler from './src/commands/newgame'
@@ -18,7 +18,7 @@ require('dotenv').config()
 const token = process.env.DISCORD_TOKEN
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] })
+const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
@@ -34,7 +34,7 @@ if (token) {
 
 export interface CommandHandler {
   commandName: string
-  execute: (interaction: CommandInteraction) => Promise<void>
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
 const handlers = new Map<string, CommandHandler>()
@@ -70,7 +70,8 @@ const helpHandler: CommandHandler = {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) {
+  // if (interaction.type !== InteractionType.ApplicationCommand) {
+  if (!interaction.isChatInputCommand()) {
     return
   }
 
