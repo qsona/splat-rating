@@ -32,7 +32,7 @@ const dashHandler: ButtonCommandHandler = {
   },
 }
 const jumpHandler: ButtonCommandHandler = {
-  customId: 'dash',
+  customId: 'jump',
   execute: async (interaction) => {
     const rowDash = new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('dash').setLabel('Dash!').setStyle(ButtonStyle.Danger))
     await interaction.reply({ content: '???????Jump', components: [rowDash] })
