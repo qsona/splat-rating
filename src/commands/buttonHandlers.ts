@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js'
 import { joinButtonHandler } from './join'
 
 export type ButtonCommandHandler = {
@@ -23,8 +23,12 @@ export const execute = async (interaction: ButtonInteraction) => {
 const dashHandler: ButtonCommandHandler = {
   customId: 'dash',
   execute: async (interaction) => {
-    const rowJump = new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('jump').setLabel('Jump!').setStyle(ButtonStyle.Primary))
-    await interaction.reply({ content: 'Dash!!!!!!!', components: [rowJump] })
+    const modal = new ModalBuilder().setCustomId('modal-dash').setTitle('Dash!')
+    const countInput = new TextInputBuilder().setCustomId('countInput').setLabel('count?').setStyle(TextInputStyle.Short)
+
+    const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(countInput)
+    modal.addComponents(firstActionRow)
+    await interaction.showModal(modal)
   },
 }
 const jumpHandler: ButtonCommandHandler = {

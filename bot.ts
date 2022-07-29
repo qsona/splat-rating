@@ -15,6 +15,7 @@ import displayHandler from './src/commands/display'
 import pingHandler from './src/commands/ping'
 
 import { execute as executeButtonHandlers } from './src/commands/buttonHandlers'
+import { execute as executeModalHandlers } from './src/commands/modalHandlers'
 
 require('dotenv').config()
 
@@ -83,6 +84,11 @@ client.on('interactionCreate', async (interaction) => {
 
   if (interaction.isButton()) {
     await executeButtonHandlers(interaction)
+    return
+  }
+
+  if (interaction.type === InteractionType.ModalSubmit) {
+    await executeModalHandlers(interaction)
     return
   }
 })
