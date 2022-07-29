@@ -3,12 +3,13 @@ import { CommandHandler } from '../../bot'
 import { prisma } from '../prismaClient'
 import { createMatching } from '../operations/createMatching'
 import { inspectTeamUsers } from '../inspectors'
+import { createWinButton, createLoseButton, createCancelButton } from './helpers/buttons'
 
 const handler: CommandHandler = {
   commandName: 'sr-match',
   execute: async (interaction) => {
     const { channelId } = interaction
-    const { id, username } = interaction.user
+    const { id } = interaction.user
 
     const result = await createMatching(id, channelId)
 
@@ -31,7 +32,7 @@ const handler: CommandHandler = {
       const usernames = (await prisma.user.findMany({ where: { id: { in: watchingUserIds } }, select: { name: true } })).map((u) => u.name)
       messages.push(`観戦: ${usernames.join(' ')}`)
     }
-    await interaction.reply(messages.join('\n'))
+    await interaction.reply({ content: messages.join('\n'), components: [createWinButton(), createLoseButton(), createCancelButton()] })
   },
 }
 

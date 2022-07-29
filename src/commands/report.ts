@@ -4,6 +4,7 @@ import { CommandHandler } from '../../bot'
 import { inspectRating } from '../inspectors'
 import { reportMatching, RatingResult } from '../operations/reportMatching'
 import { cancelMatching } from '../operations/cancelMatching'
+import { createMatchButton } from './helpers/buttons'
 
 const handler: CommandHandler = {
   commandName: 'sr-report',
@@ -69,7 +70,7 @@ const handler: CommandHandler = {
     }
     const messages = [`Winners: ${inspectTeamUsers(winnerTeamsRatings)}`, `Losers: ${inspectTeamUsers(loserTeamsRatings)}`]
 
-    await interaction.reply(messages.join('\n'))
+    await interaction.reply({ content: messages.join('\n'), components: [createMatchButton()] })
   },
 }
 
