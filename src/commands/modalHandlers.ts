@@ -23,7 +23,7 @@ const dashHandler: ModalCommandHandler = {
   customId: 'modal-dash',
   execute: async (interaction) => {
     const countStr = interaction.fields.getTextInputValue('countInput')
-    const count = Math.trunc(Number(countStr)) || 0
+    const count = Math.max(Math.trunc(Number(countStr)) || 0, 0)
     await interaction.reply(`Dash! ⊂${'二'.repeat(count)}（ ＾ω＾）${'二'.repeat(count)}⊃`)
   },
 }
