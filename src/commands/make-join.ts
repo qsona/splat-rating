@@ -22,19 +22,19 @@ const handler: CommandHandler = {
 
     const result = await joinRoom(id, channelId, guildId)
 
-    if (result === 'ROOM_DOES_NOT_EXIST') {
+    if (result.error === 'ROOM_DOES_NOT_EXIST') {
       await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')
       return
     }
-    if (result === 'RATING_DOES_NOT_EXIST') {
+    if (result.error === 'RATING_DOES_NOT_EXIST') {
       await interaction.reply(`${username} さんはレーティング登録がまだです。/sr-register コマンドで登録してください。`)
       return
     }
-    if (result === 'USER_ALREADY_JOINED') {
+    if (result.error === 'USER_ALREADY_JOINED') {
       await interaction.reply(`${username} さんはすでに参加しています。`)
       return
     }
-    if (result === 'TOO_MANY_JOINED_USERS') {
+    if (result.error === 'TOO_MANY_JOINED_USERS') {
       await interaction.reply('このチャンネルのゲームは定員を超えています。')
       return
     }

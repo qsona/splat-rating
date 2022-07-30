@@ -3,8 +3,10 @@ import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectRating } from '../inspectors'
+import { createRegisterButton } from './helpers/buttons'
 import { ButtonCommandHandler } from './buttonHandlers'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
+import { SplatRuleSet } from 'src/rules'
 
 const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInteraction) => {
   const { channelId, guildId } = interaction
@@ -13,19 +15,22 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
 
   const result = await joinRoom(id, channelId, guildId)
 
-  if (result === 'ROOM_DOES_NOT_EXIST') {
+  if (result.error === 'ROOM_DOES_NOT_EXIST') {
     await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')
     return
   }
-  if (result === 'RATING_DOES_NOT_EXIST') {
-    await interaction.reply(`${username} さんはレーティング登録がまだです。/sr-register コマンドで登録してください。`)
+  if (result.error === 'RATING_DOES_NOT_EXIST') {
+    await interaction.reply({
+      content: `${username} さんはレーティング登録がまだです。/sr-register コマンドまたは登録ボタンで登録してください。`,
+      components: [createRegisterButton(result.room.rule as SplatRuleSet)],
+    })
     return
   }
-  if (result === 'USER_ALREADY_JOINED') {
+  if (result.error === 'USER_ALREADY_JOINED') {
     await interaction.reply(`${username} さんはすでに参加しています。`)
     return
   }
-  if (result === 'TOO_MANY_JOINED_USERS') {
+  if (result.error === 'TOO_MANY_JOINED_USERS') {
     await interaction.reply('このチャンネルのゲームは定員を超えています。')
     return
   }

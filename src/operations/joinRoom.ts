@@ -7,7 +7,7 @@ export const joinRoom = async (userId: string, discordChannelId: string, guildId
     where: { discordChannelId },
   })
   if (!room) {
-    return 'ROOM_DOES_NOT_EXIST'
+    return { error: 'ROOM_DOES_NOT_EXIST' as const }
   }
   const { rule } = room
   const rating = await prisma.rating.findUnique({
@@ -16,7 +16,7 @@ export const joinRoom = async (userId: string, discordChannelId: string, guildId
     },
   })
   if (!rating) {
-    return 'RATING_DOES_NOT_EXIST'
+    return { error: 'RATING_DOES_NOT_EXIST' as const, room }
   }
 
   let joinedUsersCount = await prisma.joinedUser.count({
@@ -25,7 +25,7 @@ export const joinRoom = async (userId: string, discordChannelId: string, guildId
     },
   })
   if (joinedUsersCount >= 10) {
-    return 'TOO_MANY_JOINED_USERS'
+    return { error: 'TOO_MANY_JOINED_USERS' as const }
   }
 
   let joinedUser: JoinedUser
@@ -39,7 +39,7 @@ export const joinRoom = async (userId: string, discordChannelId: string, guildId
     })
   } catch (e) {
     if ((e as any).code === 'P2002') {
-      return 'USER_ALREADY_JOINED'
+      return { error: 'USER_ALREADY_JOINED' as const }
     }
     throw e
   }
