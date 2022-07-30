@@ -54,6 +54,6 @@ const handler: CommandHandler = {
 export default handler
 
 export const joinButtonHandler: ButtonCommandHandler = {
-  customId: 'b-join',
+  customId: 'button-join',
   execute: joinExecute,
 }
