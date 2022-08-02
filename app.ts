@@ -3,11 +3,13 @@ import passport from 'passport'
 import { prisma } from './src/prismaClient'
 import { SPLAT_RULES_NAME_MAP } from './src/rules'
 import { Strategy as DiscordStrategy } from 'passport-discord'
+import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { Template } from './src/models/graphData'
 import { Profile } from './src/models/profile'
 
 require('dotenv').config()
 import session from 'express-session'
+import { PrismaClient } from '@prisma/client'
 const app = express()
 const port = process.env.PORT || 3000
 const ADMIN_IDS = ['535814780787884073', '928994301373976607']
@@ -21,11 +23,13 @@ app.use(
     name: 'session',
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      path: '/',
-      httpOnly: true,
-      maxAge: 60 * 60 * 1000,
-    },
+    store: new PrismaSessionStore(
+      new PrismaClient(), {
+        checkPeriod: 2 * 60 * 1000,
+        dbRecordIdIsSessionId: true,
+        dbRecordIdFunction: undefined,
+      }
+    )
   })
 )
 app.use(passport.initialize())
