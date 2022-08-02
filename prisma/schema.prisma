@@ -108,3 +108,10 @@ model Matching {
   room           Room     @relation(fields: [roomId], references: [id])
   createdAt      DateTime @default(now())
 }
+
+model Session {
+  id          String @id
+  sid         String @unique
+  data        String
+  expiresAt   DateTime
+}
