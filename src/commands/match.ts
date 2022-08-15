@@ -4,36 +4,40 @@ import { prisma } from '../prismaClient'
 import { createMatching } from '../operations/createMatching'
 import { inspectTeamUsers } from '../inspectors'
 import { createWinButton, createLoseButton, createCancelButton } from './helpers/buttons'
+import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
+import { ButtonCommandHandler } from './buttonHandlers'
+
+const matchExecute = async (interaction: ButtonInteraction | ChatInputCommandInteraction) => {
+  const { id } = interaction.user
+  const { channelId } = interaction
+
+  const result = await createMatching(id, channelId)
+
+  if (result === 'ROOM_DOES_NOT_EXIST') {
+    await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')
+    return
+  }
+  if (result === 'MATCHING_EXISTS') {
+    await interaction.reply('すでにマッチングが存在します。ホストは `/sr-report` コマンドで結果を報告してください。')
+    return
+  }
+  if (result === 'JOINED_USERS_NOT_ENOUGH') {
+    await interaction.reply(`参加人数が足りません。`)
+    return
+  }
+
+  const { matching, watchingUserIds } = result
+  const messages = [await inspectTeamsUsers(matching.teamsRatingIds as string[][])]
+  if (watchingUserIds.length > 0) {
+    const usernames = (await prisma.user.findMany({ where: { id: { in: watchingUserIds } }, select: { name: true } })).map((u) => u.name)
+    messages.push(`観戦: ${usernames.join(' ')}`)
+  }
+  await interaction.reply({ content: messages.join('\n'), components: [createWinButton(), createLoseButton(), createCancelButton()] })
+}
 
 const handler: CommandHandler = {
   commandName: 'sr-match',
-  execute: async (interaction) => {
-    const { channelId } = interaction
-    const { id } = interaction.user
-
-    const result = await createMatching(id, channelId)
-
-    if (result === 'ROOM_DOES_NOT_EXIST') {
-      await interaction.reply('このチャンネルに募集中のゲームは現在ありません。')
-      return
-    }
-    if (result === 'MATCHING_EXISTS') {
-      await interaction.reply('すでにマッチングが存在します。ホストは `/sr-report` コマンドで結果を報告してください。')
-      return
-    }
-    if (result === 'JOINED_USERS_NOT_ENOUGH') {
-      await interaction.reply(`参加人数が足りません。`)
-      return
-    }
-
-    const { matching, watchingUserIds } = result
-    const messages = [await inspectTeamsUsers(matching.teamsRatingIds as string[][])]
-    if (watchingUserIds.length > 0) {
-      const usernames = (await prisma.user.findMany({ where: { id: { in: watchingUserIds } }, select: { name: true } })).map((u) => u.name)
-      messages.push(`観戦: ${usernames.join(' ')}`)
-    }
-    await interaction.reply({ content: messages.join('\n'), components: [createWinButton(), createLoseButton(), createCancelButton()] })
-  },
+  execute: matchExecute,
 }
 
 const inspectTeamsUsers = async (teamsRatingIds: string[][]): Promise<string> => {
@@ -61,3 +65,8 @@ const getTeamsUsers = async (teamsRatingIds: string[][]) => {
 }
 
 export default handler
+
+export const matchButtonHandler: ButtonCommandHandler = {
+  customId: 'button-match',
+  execute: matchExecute,
+}

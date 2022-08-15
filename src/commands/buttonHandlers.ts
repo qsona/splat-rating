@@ -2,6 +2,8 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ModalB
 import { SplatRuleSet, SPLAT_RULES_NAME_MAP } from '../rules'
 import { createRegisterModal } from './helpers/modals'
 import { joinButtonHandler } from './join'
+import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
+import { matchButtonHandler } from './match'
 
 export type ButtonCommandHandler = {
   customId: string
@@ -52,4 +54,13 @@ const createRegisterButtonHandler = (rule: SplatRuleSet): ButtonCommandHandler =
 
 const registerButtonHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterButtonHandler(code))
 
-;[...registerButtonHandlers, joinButtonHandler, dashHandler, jumpHandler].forEach((handler) => handlers.set(handler.customId, handler))
+;[
+  ...registerButtonHandlers,
+  joinButtonHandler,
+  reportWinButtonHandler,
+  reportLoseButtonHandler,
+  reportCancelButtonHandler,
+  matchButtonHandler,
+  dashHandler,
+  jumpHandler,
+].forEach((handler) => handlers.set(handler.customId, handler))
