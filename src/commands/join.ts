@@ -3,7 +3,7 @@ import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectRating } from '../inspectors'
-import { createRegisterButton } from './helpers/buttons'
+import { createMatchButton, createRegisterButton } from './helpers/buttons'
 import { ButtonCommandHandler } from './buttonHandlers'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
 import { SplatRuleSet } from 'src/rules'
@@ -37,13 +37,9 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
 
   const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
   const { remainMaxUsersCount } = result
-  const messages = [`${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`]
+  const message = `${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
 
-  if (result.remainMinUsersCount === 0) {
-    messages.push('ホストは `/sr-match` でチーム分けしてください')
-  }
-
-  await interaction.reply(messages.join('\n'))
+  await interaction.reply({ content: message, components: result.remainMinUsersCount === 0 ? [createMatchButton()] : [] })
 }
 
 const handler: CommandHandler = {
