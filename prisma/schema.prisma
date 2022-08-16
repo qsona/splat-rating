@@ -65,6 +65,7 @@ model Rating {
   JoinedUser       JoinedUser[]
 
   @@unique([userId, guildId, rule])
+  @@index([guildId, rule])
 }
 
 model GameResult {

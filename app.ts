@@ -9,10 +9,11 @@ import { Profile } from './src/models/profile'
 
 require('dotenv').config()
 import session from 'express-session'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Rating } from '@prisma/client'
 const app = express()
 const port = process.env.PORT || 3000
 const ADMIN_IDS = ['535814780787884073', '928994301373976607']
+const SPLAT_ROOM_GUILD_ID = '853262631837630484';
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -158,6 +159,40 @@ app.get('/history', isAuthenticated, async (req, res) => {
     include: { gameResult: true },
   })
   res.render('history', { loginUser, isAdmin: isAdmin(req), ratings, rules: SPLAT_RULES_NAME_MAP })
+})
+
+app.get('/ranking', isAuthenticated, async (req, res) => {
+  const profile = <Profile>req.user
+  const loginUser = await prisma.user.findUnique({
+    where: { id: profile.id },
+  })
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+
+  const rankingMap = new Map()
+
+  for (var i = 0; i < SPLAT_RULES_NAME_MAP.length; i++) {
+    const rule = SPLAT_RULES_NAME_MAP[i];
+    const ratings = await prisma.rating.findMany({
+      where: {
+        guildId: SPLAT_ROOM_GUILD_ID,
+        rule: rule.code
+      },
+      orderBy: {
+        mu: 'desc'
+      }
+    })
+    const rank = ratings.findIndex((r) => r.userId === loginUser.id) + 1
+    if (rank !== 0) {
+      rankingMap.set(rule.code, {
+        rank: rank,
+        count: ratings.length
+      })
+    }
+  }
+  console.log(rankingMap)
+  return res.send('ranking')
 })
 
 app.get('/admin/users', isAuthenticated, async (req, res) => {
