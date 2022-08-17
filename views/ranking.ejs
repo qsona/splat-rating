@@ -25,11 +25,15 @@
                                     <% if (rankingMap.has(rule.code)) { %>
                                         <% const ruleRanking = rankingMap.get(rule.code) %>
                                         <div class="row my-1">
-                                            <div class="col-3">
+                                            <div class="col-3 d-flex align-items-center">
                                                 <h4 class="small fw-bold"><%= rule.name %></h4>
                                             </div>
-                                            <div class="col-3 ranking-<%= ruleRanking.simpleRank %>"><%= ruleRanking.simpleRank %> / <%= ruleRanking.count %></div>
-                                            <div class="col-3 ranking-<%= ruleRanking.mu3SigmaRank %>"><%= ruleRanking.mu3SigmaRank %> / <%= ruleRanking.count %></div>
+                                            <div class="col-3">
+                                                <span class="fs-2 ranking-<%= ruleRanking.simpleRank %>"><%= ruleRanking.simpleRank %></span> / <%= ruleRanking.count %>
+                                            </div>
+                                            <div class="col-3">
+                                                <span class="fs-2 ranking-<%= ruleRanking.mu3SigmaRank %>"><%= ruleRanking.mu3SigmaRank %></span> / <%= ruleRanking.count %>
+                                            </div>
                                         </div>
                                     <% } %>
                                 <% }) %>
