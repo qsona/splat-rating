@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<%- include('components/head'); %>
+
+<body id="page-top">
+    <div id="wrapper">
+        <%- include('components/left-nav', { active: 'ranking', loginUser: loginUser }); %>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <%- include('components/head-nav', { loginUser: loginUser }); %>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Ranking (<%= user.name %>)</h3>
+                    <div class="card shadow mb-5">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Ratings</p>
+                        </div>
+                        <div class="card-body">
+                            <% if (rankingMap) { %>
+                                <div class="row my-1">
+                                    <div class="col-3">ルール</div>
+                                    <div class="col-3">パワーランキング</div>
+                                    <div class="col-3">計測パワーランキング</div>
+                                </div>
+                                <% rules.forEach((rule) => {%>
+                                    <% if (rankingMap.has(rule.code)) { %>
+                                        <% const ruleRanking = rankingMap.get(rule.code) %>
+                                        <div class="row my-1">
+                                            <div class="col-3">
+                                                <h4 class="small fw-bold"><%= rule.name %></h4>
+                                            </div>
+                                            <div class="col-3 ranking-<%= ruleRanking.simpleRank %>"><%= ruleRanking.simpleRank %> / <%= ruleRanking.count %></div>
+                                            <div class="col-3 ranking-<%= ruleRanking.mu3SigmaRank %>"><%= ruleRanking.mu3SigmaRank %> / <%= ruleRanking.count %></div>
+                                        </div>
+                                    <% } %>
+                                <% }) %>
+                            <% } else { %>
+                                <p>対戦結果はまだありません</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include('components/footer'); %>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <%- include('components/footer-scripts'); %>
+</body>
+
+</html>

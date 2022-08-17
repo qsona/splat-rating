@@ -183,16 +183,33 @@ app.get('/ranking', isAuthenticated, async (req, res) => {
         mu: 'desc'
       }
     })
-    const rank = ratings.findIndex((r) => r.userId === loginUser.id) + 1
-    if (rank !== 0) {
+    const simpleRank = ratings.findIndex((r) => r.userId === loginUser.id) + 1
+    if (simpleRank !== 0) {
+      let mu3SigmaRatings = ratings.map(function(value, idx, map) {
+        return {
+          userId: value.userId,
+          score: value.mu - (3 * value.sigma)
+        }
+      })
+      mu3SigmaRatings.sort(function (a, b) {
+        // sort by score desc
+        if (a.score < b.score) {
+          return 1
+        }
+        if (b.score < a.score) {
+          return -1
+        }
+        return 0
+      })
+      const mu3SigmaRank = mu3SigmaRatings.findIndex((r) => r.userId === loginUser.id) + 1
       rankingMap.set(rule.code, {
-        rank: rank,
+        simpleRank: simpleRank,
+        mu3SigmaRank: mu3SigmaRank,
         count: ratings.length
       })
     }
   }
-  console.log(rankingMap)
-  return res.send('ranking')
+  res.render('ranking', { loginUser, user: loginUser, isAdmin: isAdmin(req), rankingMap, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.get('/admin/users', isAuthenticated, async (req, res) => {
