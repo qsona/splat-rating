@@ -1,6 +1,4 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js'
-import { SplatRuleSet, SPLAT_RULES_NAME_MAP } from '../rules'
-import { createRegisterModal } from './helpers/modals'
 import { joinButtonHandler } from './join'
 import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
 import { matchButtonHandler } from './match'
@@ -43,24 +41,6 @@ const jumpHandler: ButtonCommandHandler = {
   },
 }
 
-const createRegisterButtonHandler = (rule: SplatRuleSet): ButtonCommandHandler => {
-  return {
-    customId: `button-register-${rule}`,
-    execute: async (interaction) => {
-      await interaction.showModal(createRegisterModal(rule))
-    },
-  }
-}
-
-const registerButtonHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterButtonHandler(code))
-
-;[
-  ...registerButtonHandlers,
-  joinButtonHandler,
-  reportWinButtonHandler,
-  reportLoseButtonHandler,
-  reportCancelButtonHandler,
-  matchButtonHandler,
-  dashHandler,
-  jumpHandler,
-].forEach((handler) => handlers.set(handler.customId, handler))
+;[joinButtonHandler, reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler, matchButtonHandler, dashHandler, jumpHandler].forEach(
+  (handler) => handlers.set(handler.customId, handler)
+)
