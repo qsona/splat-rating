@@ -10,6 +10,7 @@ import { createMatching } from './src/operations/createMatching'
 import { reportMatching } from './src/operations/reportMatching'
 import { cancelMatching } from './src/operations/cancelMatching'
 import { getCurrentSeason } from './src/models/season'
+import { resetSigmaAllInGuild, resetRating } from './src/operations/resetRating'
 
 // Print the welcome message
 console.log(`
@@ -32,6 +33,8 @@ Object.entries({
   reportMatching,
   cancelMatching,
   getCurrentSeason,
+  resetSigmaAllInGuild,
+  resetRating,
 }).forEach(([k, v]) => {
   repl.context[k] = v
 })
