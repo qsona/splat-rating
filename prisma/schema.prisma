@@ -24,6 +24,7 @@ model User {
 model Room {
   id               String   @id @default(cuid())
   discordChannelId String
+  guildId          String
   rule             String
   createdAt        DateTime @default(now())
   creatorUserId    String
@@ -61,8 +62,10 @@ model Rating {
   loseCount Int      @default(0)
   createdAt DateTime @default(now())
 
-  GameResultRating GameResultRating[]
-  JoinedUser       JoinedUser[]
+  GameResultRating     GameResultRating[]
+  JoinedUser           JoinedUser[]
+  seasonRecords        SeasonRecord[]
+  ratingChangedHistory RatingChangedHistory[]
 
   @@unique([userId, guildId, rule])
 }
@@ -74,6 +77,8 @@ model GameResult {
   beta              Float
   metadata          Json?
   rule              String             @default("SplatZones") // remove default value later
+  seasonId          String?
+  season            Season?            @relation(fields: [seasonId], references: [id])
   createdAt         DateTime           @default(now())
   GameResultRating  GameResultRating[]
 }
@@ -106,7 +111,54 @@ model Matching {
   metadata       Json?
   roomId         String   @unique
   room           Room     @relation(fields: [roomId], references: [id])
+  seasonId       String?
+  season         Season?  @relation(fields: [seasonId], references: [id])
   createdAt      DateTime @default(now())
+}
+
+model Season {
+  id                   String                 @id @default(cuid())
+  name                 String
+  guildId              String
+  startAt              DateTime
+  seasonRecords        SeasonRecord[]
+  matchings            Matching[]
+  gameResults          GameResult[]
+  RatingChangedHistory RatingChangedHistory[]
+
+  @@index([guildId, startAt])
+}
+
+model SeasonRecord {
+  id        String @id @default(cuid())
+  seasonId  String
+  season    Season @relation(fields: [seasonId], references: [id])
+  ratingId  String
+  rating    Rating @relation(fields: [ratingId], references: [id])
+  mu        Float
+  sigma     Float
+  rankPoint Float
+  winCount  Int
+  loseCount Int
+
+  @@unique([ratingId, seasonId])
+  @@index([seasonId, rankPoint])
+}
+
+model RatingChangedHistory {
+  id          String  @id @default(cuid())
+  ratingId    String
+  rating      Rating  @relation(fields: [ratingId], references: [id])
+  seasonId    String?
+  season      Season? @relation(fields: [seasonId], references: [id])
+  muBefore    Float
+  muAfter     Float
+  sigmaBefore Float
+  sigmaAfter  Float
+  reason      String?
+
+  @@index([ratingId, seasonId])
+  @@index([seasonId])
 }
 
 model Session {
