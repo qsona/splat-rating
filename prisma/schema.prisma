@@ -24,6 +24,7 @@ model User {
 model Room {
   id               String   @id @default(cuid())
   discordChannelId String
+  guildId          String
   rule             String
   createdAt        DateTime @default(now())
   creatorUserId    String

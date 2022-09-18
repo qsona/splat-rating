@@ -28,8 +28,11 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
     return 'USER_IS_NOT_CREATOR'
   }
 
+  const { seasonId } = matching
+  const teamsRatingIds = matching.teamsRatingIds as string[][]
+
   return await prisma.$transaction(async (prisma) => {
-    const teamsRatings = await Aigle.map(matching.teamsRatingIds as string[][], async (teamRatingIds) => {
+    const teamsRatings = await Aigle.map(teamsRatingIds, async (teamRatingIds) => {
       const teamRatings = await prisma.rating.findMany({
         where: { id: { in: teamRatingIds } },
       })
@@ -41,6 +44,7 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
         return rating
       })
     })
+
     const sortedTeamsRatings = isAlphaWin ? [teamsRatings[0], teamsRatings[1]] : [teamsRatings[1], teamsRatings[0]]
     const newTeamsRatings = rate(sortedTeamsRatings, { beta: BETA })
     console.log('win', newTeamsRatings[0])
@@ -49,17 +53,37 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
       const isWinner = teamIndex === 0
       return await Aigle.map(teamRatings, async (rating, ratingIndex) => {
         const newRating = newTeamsRatings[teamIndex][ratingIndex]
-        const additionalUpdateData = isWinner ? { winCount: { increment: 1 } } : { loseCount: { increment: 1 } }
+        const updateData = {
+          mu: newRating.mu,
+          sigma: newRating.sigma,
+        }
+        const winLoseCountCreateData = { winCount: isWinner ? 1 : 0, loseCount: isWinner ? 0 : 1 }
+        const winLoseCountUpdateData = isWinner ? { winCount: { increment: 1 } } : { loseCount: { increment: 1 } }
+
         await prisma.rating.update({
           where: {
             id: rating.id,
           },
-          data: {
-            mu: newRating.mu,
-            sigma: newRating.sigma,
-            ...additionalUpdateData,
-          },
+          data: { ...updateData, ...winLoseCountUpdateData },
         })
+
+        if (seasonId) {
+          const rankPoint = updateData.mu - 3 * updateData.sigma
+          const seasonUpdateData = {
+            ...updateData,
+            rankPoint,
+          }
+          await prisma.seasonRecord.upsert({
+            where: { ratingId_seasonId: { ratingId: rating.id, seasonId } },
+            update: { ...seasonUpdateData, ...winLoseCountUpdateData },
+            create: {
+              seasonId,
+              ratingId: rating.id,
+              ...seasonUpdateData,
+              ...winLoseCountCreateData,
+            },
+          })
+        }
 
         return {
           ratingId: rating.id,
@@ -82,6 +106,7 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
         rule: room.rule,
         winnerTeamRatings,
         loserTeamRatings,
+        seasonId,
       },
     })
 

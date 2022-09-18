@@ -2,6 +2,7 @@ import assert from 'assert'
 import { sum, difference } from 'lodash'
 import { Rating } from '@prisma/client'
 import { prisma } from '../prismaClient'
+import { getCurrentSeason } from '../models/season'
 
 export const createMatching = async (userId: string, channelId: string) => {
   // TODO: acquire lock
@@ -11,7 +12,6 @@ export const createMatching = async (userId: string, channelId: string) => {
   if (!room) {
     return 'ROOM_DOES_NOT_EXIST'
   }
-  const { rule } = room
 
   // TODO: who can create matching?
   const matchingExists = !!(await prisma.matching.count({
@@ -44,7 +44,8 @@ export const createMatching = async (userId: string, channelId: string) => {
     throw new Error(`mismatch between ratings and joinedUsers. ratingIds: ${joinedUserRatingIds}`)
   }
 
-  const { creatorUserId, watchedUserIds } = room
+  const { guildId, creatorUserId, watchedUserIds } = room
+  const season = await getCurrentSeason(guildId)
 
   // move creator rating to first
   const creatorRatingIndex = ratings.findIndex((r) => r.userId === creatorUserId)
@@ -82,9 +83,10 @@ export const createMatching = async (userId: string, channelId: string) => {
 
   const matching = await prisma.matching.create({
     data: {
-      room: { connect: { id: room.id } },
+      roomId: room.id,
       teamsRatingIds: teamsRatings.map((teamRatings) => teamRatings.map((r) => r.id)),
       metadata: { watchingUserIds },
+      seasonId: season?.id,
     },
   })
   await prisma.room.update({

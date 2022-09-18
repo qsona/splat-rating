@@ -9,6 +9,7 @@ import { breakRoom } from './src/operations/breakRoom'
 import { createMatching } from './src/operations/createMatching'
 import { reportMatching } from './src/operations/reportMatching'
 import { cancelMatching } from './src/operations/cancelMatching'
+import { getCurrentSeason } from './src/models/season'
 
 // Print the welcome message
 console.log(`
@@ -30,6 +31,7 @@ Object.entries({
   createMatching,
   reportMatching,
   cancelMatching,
+  getCurrentSeason,
 }).forEach(([k, v]) => {
   repl.context[k] = v
 })
