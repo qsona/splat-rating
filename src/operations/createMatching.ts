@@ -81,7 +81,7 @@ export const createMatching = async (userId: string, channelId: string) => {
     where: { roomId: room.id },
     include: { firstJoinedUser: true, secondJoinedUser: true },
   })
-  const separations = joinedUsersSeparations.map((jus) => ({ firstUserId: jus.firstJoinedUser.userId, secondUserId: jus.secondJoinedUserId }))
+  const separations = joinedUsersSeparations.map((jus) => ({ firstUserId: jus.firstJoinedUser.userId, secondUserId: jus.secondJoinedUser.userId }))
 
   const teamsRatings = calculateMatchingWithMinRateDiff(ratings, separations)
 
