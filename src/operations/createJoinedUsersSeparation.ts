@@ -14,9 +14,9 @@ export const createJoinedUsersSeparation = async (userIds: [string, string], dis
     return { error: 'ROOM_DOES_NOT_EXIST' as const }
   }
 
-  const notJoinedUserIds = userIds.filter((userId) => room.joinedUsers.every((ju) => ju.userId !== userId))
-  if (notJoinedUserIds.length) {
-    return { error: 'USER_NOT_JOINED' as const, notJoinedUserIds }
+  const separatingJoinedUsers = room.joinedUsers.filter((ju) => userIds.includes(ju.userId))
+  if (separatingJoinedUsers.length !== 2) {
+    return { error: 'USER_NOT_JOINED' as const }
   }
 
   const joinedUsersSeparationUserIds = room.joinedUsersSeparations.flatMap((jus) => [jus.firstJoinedUserId, jus.secondJoinedUserId])
@@ -27,8 +27,8 @@ export const createJoinedUsersSeparation = async (userIds: [string, string], dis
 
   const joinedUsersSeparation = await prisma.joinedUsersSeparation.create({
     data: {
-      firstJoinedUserId: userIds[0],
-      secondJoinedUserId: userIds[1],
+      firstJoinedUserId: separatingJoinedUsers[0].id,
+      secondJoinedUserId: separatingJoinedUsers[1].id,
       roomId: room.id,
     },
   })
