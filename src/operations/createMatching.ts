@@ -77,7 +77,13 @@ export const createMatching = async (userId: string, channelId: string) => {
   // put creator to head
   ratings.unshift(creatorRating)
 
-  const teamsRatings = calculateMatchingWithMinRateDiff(ratings)
+  const joinedUsersSeparations = await prisma.joinedUsersSeparation.findMany({
+    where: { roomId: room.id },
+    include: { firstJoinedUser: true, secondJoinedUser: true },
+  })
+  const separations = joinedUsersSeparations.map((jus) => ({ firstUserId: jus.firstJoinedUser.userId, secondUserId: jus.secondJoinedUserId }))
+
+  const teamsRatings = calculateMatchingWithMinRateDiff(ratings, separations)
 
   const watchingUserIds = watchingUserRatings.map((r) => r.userId)
 
@@ -101,17 +107,32 @@ export const createMatching = async (userId: string, channelId: string) => {
 }
 
 // the first element of ratings must be creator's rating
-export const calculateMatchingWithMinRateDiff = (ratings: Rating[]) => {
+export const calculateMatchingWithMinRateDiff = (ratings: Rating[], separations: { firstUserId: string; secondUserId: string }[] = []) => {
   assert.equal(ratings.length, 8)
   let minRateDiff = Number.POSITIVE_INFINITY
   let rates = ratings.map((r) => r.mu)
   let totalRate = sum(rates)
   let currentAlphaTeamIndexes: number[] = []
 
+  const isSeparated = (alphaTeamIndexes: [number, number, number, number]): boolean => {
+    const alphaTeamUserIds: string[] = []
+    const bravoTeamUserIds: string[] = []
+    ratings.forEach(({ userId }, index) => (alphaTeamIndexes.includes(index) ? alphaTeamUserIds : bravoTeamUserIds).push(userId))
+
+    return separations.every(({ firstUserId, secondUserId }): boolean => {
+      if (alphaTeamUserIds.includes(firstUserId) && alphaTeamUserIds.includes(secondUserId)) return false
+      if (bravoTeamUserIds.includes(firstUserId) && bravoTeamUserIds.includes(secondUserId)) return false
+      return true
+    })
+  }
+
   for (let i = 1; i <= 5; i++) {
     for (let j = i + 1; j <= 6; j++) {
       for (let k = j + 1; k <= 7; k++) {
-        const alphaTeamIndexes = [0, i, j, k]
+        const alphaTeamIndexes: [number, number, number, number] = [0, i, j, k]
+
+        if (!isSeparated(alphaTeamIndexes)) continue
+
         const alphaTeamTotalRate = sum(alphaTeamIndexes.map((i) => rates[i]))
         const bravoTeamTotalRate = totalRate - alphaTeamTotalRate
         const rateDiff = Math.abs(alphaTeamTotalRate - bravoTeamTotalRate)

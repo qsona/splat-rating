@@ -13,6 +13,7 @@ import makeJoinHandler from './src/commands/make-join'
 import makeLeaveHandler from './src/commands/make-leave'
 import displayHandler from './src/commands/display'
 import pingHandler from './src/commands/ping'
+import separateHandler from './src/commands/separate'
 
 import { execute as executeButtonHandlers } from './src/commands/buttonHandlers'
 import { execute as executeModalHandlers } from './src/commands/modalHandlers'
@@ -64,6 +65,7 @@ const helpHandler: CommandHandler = {
   displayHandler,
   pingHandler,
   helpHandler,
+  separateHandler,
 ].forEach((handler) => {
   handlers.set(handler.commandName, handler)
 })
