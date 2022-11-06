@@ -19,10 +19,11 @@ export const createJoinedUsersSeparation = async (userIds: [string, string], dis
     return { error: 'USER_NOT_JOINED' as const }
   }
 
-  const joinedUsersSeparationUserIds = room.joinedUsersSeparations.flatMap((jus) => [jus.firstJoinedUserId, jus.secondJoinedUserId])
-  const conflictedUserIds = intersection(joinedUsersSeparationUserIds, userIds)
-  if (conflictedUserIds.length) {
-    return { error: 'SEPARATION_CONFLICTED' as const, conflictedUserIds }
+  const joinedUsersSeparationJoinedUserIds = room.joinedUsersSeparations.flatMap((jus) => [jus.firstJoinedUserId, jus.secondJoinedUserId])
+  const separatingJoinedUserIds = separatingJoinedUsers.map((ju) => ju.id)
+  const conflictedJoinedUserIds = intersection(joinedUsersSeparationJoinedUserIds, separatingJoinedUserIds)
+  if (conflictedJoinedUserIds.length) {
+    return { error: 'SEPARATION_CONFLICTED' as const }
   }
 
   const joinedUsersSeparation = await prisma.joinedUsersSeparation.create({
