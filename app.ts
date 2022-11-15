@@ -4,12 +4,16 @@ import { prisma } from './src/prismaClient'
 import { SPLAT_RULES_NAME_MAP } from './src/rules'
 import { Strategy as DiscordStrategy } from 'passport-discord'
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
-import { Template } from './src/models/graphData'
 import { Profile } from './src/models/profile'
 
 require('dotenv').config()
 import session from 'express-session'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Rating } from '@prisma/client'
+import { getLoginUser } from './src/queries/getLoginUser'
+import { getRatings } from './src/queries/getRatings'
+import { getPowerGraphData } from './src/queries/getPowerGraphData'
+import { getRankingData } from './src/queries/getRankingData'
+
 const app = express()
 const port = process.env.PORT || 3000
 const ADMIN_IDS = ['535814780787884073', '928994301373976607']
@@ -66,51 +70,17 @@ app.get('/logout', (req, res) => {
 })
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
-  const profile = <Profile>req.user
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
+  const loginUser = await getLoginUser(req)
   if (!loginUser) {
     return res.status(404).send('User Not Found')
   }
-  const ratings = await prisma.rating.findMany({
-    where: { userId: loginUser.id },
-  })
-
-  const gameResultRatings = await prisma.gameResultRating.findMany({
-    where: { userId: loginUser.id },
-    orderBy: { createdAt: 'asc' },
-    include: { gameResult: true },
-  })
-  let rulesRatingMap = new Map()
-  SPLAT_RULES_NAME_MAP.forEach(function (rule) {
-    // do clone without npm clone module
-    rulesRatingMap.set(rule.code, JSON.parse(JSON.stringify(Template)))
-  })
-  if (gameResultRatings) {
-    gameResultRatings.forEach(function (gameResultRating) {
-      let templateData = rulesRatingMap.get(gameResultRating.gameResult.rule)
-      const formattedCreatedAt =
-        gameResultRating.createdAt.getMonth() +
-        1 +
-        '/' +
-        gameResultRating.createdAt.getDate() +
-        ' ' +
-        ('0' + gameResultRating.createdAt.getHours()).slice(-2) +
-        ':' +
-        ('0' + gameResultRating.createdAt.getMinutes()).slice(-2)
-      templateData.data.labels.push(formattedCreatedAt)
-      templateData.data.datasets[0].data.push(Math.floor(gameResultRating.muAfter))
-    })
-  }
-  res.render('dashboard', { loginUser, user: loginUser, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
+  const ratings = await getRatings(loginUser)
+  const powerGraphData = await getPowerGraphData(loginUser)
+  res.render('dashboard', { loginUser, user: loginUser, isAdmin: isAdmin(req), ratings, powerGraphData, rules: SPLAT_RULES_NAME_MAP })
 })
 
 app.get('/profile', isAuthenticated, async (req, res) => {
-  const profile = <Profile>req.user
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
+  const loginUser = await getLoginUser(req)
   if (!loginUser) {
     return res.status(404).send('User Not Found')
   }
@@ -119,9 +89,7 @@ app.get('/profile', isAuthenticated, async (req, res) => {
 
 app.post('/profile', isAuthenticated, async (req, res) => {
   const profile = <Profile>req.user
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
+  const loginUser = await getLoginUser(req)
 
   if (!loginUser) {
     return res.status(404).send('User Not Found')
@@ -145,10 +113,7 @@ app.post('/profile', isAuthenticated, async (req, res) => {
 
 // TODO: showCount, pageId
 app.get('/history', isAuthenticated, async (req, res) => {
-  const profile = <Profile>req.user
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
+  const loginUser = await getLoginUser(req)
   if (!loginUser) {
     return res.status(404).send('User Not Found')
   }
@@ -160,15 +125,21 @@ app.get('/history', isAuthenticated, async (req, res) => {
   res.render('history', { loginUser, isAdmin: isAdmin(req), ratings, rules: SPLAT_RULES_NAME_MAP })
 })
 
+app.get('/ranking', isAuthenticated, async (req, res) => {
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+
+  const rankingData = await getRankingData(loginUser)
+  res.render('ranking', { loginUser, user: loginUser, isAdmin: isAdmin(req), rankingData, rules: SPLAT_RULES_NAME_MAP })
+})
+
 app.get('/admin/users', isAuthenticated, async (req, res) => {
   if (!isAdmin(req)) {
     return res.redirect('/dashboard')
   }
-  const profile = <Profile>req.user
-
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
+  const loginUser = await getLoginUser(req)
   if (!loginUser) {
     return res.status(404).send('User Not Found')
   }
@@ -180,48 +151,40 @@ app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
   if (!isAdmin(req)) {
     return res.redirect('/dashboard')
   }
-  const profile = <Profile>req.user
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
 
-  const loginUser = await prisma.user.findUnique({
-    where: { id: profile.id },
-  })
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
   })
   if (!user) {
     return res.status(404).send('User Not Found')
   }
-  const ratings = await prisma.rating.findMany({
-    where: { userId: user.id },
-  })
 
-  const gameResultRatings = await prisma.gameResultRating.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'asc' },
-    include: { gameResult: true },
-  })
-  let rulesRatingMap = new Map()
-  SPLAT_RULES_NAME_MAP.forEach(function (rule) {
-    // do clone without npm clone module
-    rulesRatingMap.set(rule.code, JSON.parse(JSON.stringify(Template)))
-  })
-  if (gameResultRatings) {
-    gameResultRatings.forEach(function (gameResultRating) {
-      let templateData = rulesRatingMap.get(gameResultRating.gameResult.rule)
-      const formattedCreatedAt =
-        gameResultRating.createdAt.getMonth() +
-        1 +
-        '/' +
-        gameResultRating.createdAt.getDate() +
-        ' ' +
-        ('0' + gameResultRating.createdAt.getHours()).slice(-2) +
-        ':' +
-        ('0' + gameResultRating.createdAt.getMinutes()).slice(-2)
-      templateData.data.labels.push(formattedCreatedAt)
-      templateData.data.datasets[0].data.push(Math.floor(gameResultRating.muAfter))
-    })
+  const ratings = await getRatings(user)
+  const powerGraphData = await getPowerGraphData(user)
+  res.render('dashboard', { loginUser, user, isAdmin: isAdmin(req), ratings, powerGraphData, rules: SPLAT_RULES_NAME_MAP })
+})
+
+app.get('/admin/ranking/:id', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
   }
-  res.render('dashboard', { loginUser, user, isAdmin: isAdmin(req), ratings, rulesRatingMap, rules: SPLAT_RULES_NAME_MAP })
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  const rankingData = await getRankingData(user)
+  res.render('ranking', { loginUser, user, isAdmin: isAdmin(req), rankingData, rules: SPLAT_RULES_NAME_MAP })
 })
 
 const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URL } = process.env

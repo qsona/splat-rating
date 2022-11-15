@@ -79,6 +79,7 @@ model Rating {
   ratingChangedHistory RatingChangedHistory[]
 
   @@unique([userId, guildId, rule])
+  @@index([guildId, rule])
 }
 
 model GameResult {
