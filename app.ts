@@ -168,6 +168,25 @@ app.get('/admin/user/:id', isAuthenticated, async (req, res) => {
   res.render('dashboard', { loginUser, user, isAdmin: isAdmin(req), ratings, powerGraphData, rules: SPLAT_RULES_NAME_MAP })
 })
 
+app.get('/admin/ranking/:id', isAuthenticated, async (req, res) => {
+  if (!isAdmin(req)) {
+    return res.redirect('/dashboard')
+  }
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.id },
+  })
+  if (!user) {
+    return res.status(404).send('User Not Found')
+  }
+  const rankingData = await getRankingData(user)
+  res.render('ranking', { loginUser, user, isAdmin: isAdmin(req), rankingData, rules: SPLAT_RULES_NAME_MAP })
+})
+
 const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URL } = process.env
 if (!DISCORD_CLIENT_ID) throw new Error('DISCORD_CLIENT_ID is not set')
 if (!DISCORD_CLIENT_SECRET) throw new Error('DISCORD_CLIENT_SECRET is not set')

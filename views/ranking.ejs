@@ -16,13 +16,13 @@
                         </div>
                         <div class="card-body">
                             <% if (rankingData) { %>
-                                <div class="row my-1">
-                                    <div class="col-3">ルール</div>
-                                    <div class="col-3">パワーランキング</div>
-                                    <div class="col-3">計測パワーランキング</div>
-                                </div>
                                 <% rules.forEach((rule) => {%>
                                     <% if (rankingData.has(rule.code)) { %>
+                                        <div class="row my-1">
+                                            <div class="col-3">ルール</div>
+                                            <div class="col-3">パワーランキング</div>
+                                            <div class="col-3">計測パワーランキング</div>
+                                        </div>
                                         <% const ruleRanking = rankingData.get(rule.code) %>
                                         <div class="row my-1">
                                             <div class="col-3 d-flex align-items-center">
@@ -33,6 +33,15 @@
                                             </div>
                                             <div class="col-3">
                                                 <span class="fs-2 ranking-<%= ruleRanking.mu3SigmaRank %>"><%= ruleRanking.mu3SigmaRank %></span> / <%= ruleRanking.count %>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="row my-1">
+                                            <div class="col-3 d-flex align-items-center">
+                                                <h4 class="small fw-bold"><%= rule.name %></h4>
+                                            </div>
+                                            <div class="col-9">
+                                                Season中の対戦結果がありません
                                             </div>
                                         </div>
                                     <% } %>
