@@ -1,6 +1,10 @@
+import assertNever from 'assert-never'
 import { ModalSubmitInteraction } from 'discord.js'
 import { registerUserAndRating } from '../operations/registerUserAndRating'
+import { joinRoom } from '../operations/joinRoom'
 import { SplatRuleSet, getRuleName, SPLAT_RULES_NAME_MAP } from '../rules'
+import { inspectRating } from '../inspectors'
+import { createJoinButton, createMatchButton } from './helpers/buttons'
 
 export type ModalCommandHandler = {
   customId: string
@@ -30,11 +34,16 @@ const dashHandler: ModalCommandHandler = {
   },
 }
 
-const createRegisterModalHandler = (rule: SplatRuleSet): ModalCommandHandler => {
+const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHandler => {
   return {
-    customId: `modal-register-${rule}`,
+    customId: `modal-register-and-join-${rule}`,
     execute: async (interaction) => {
-      const { guildId, guild } = interaction
+      const { guildId, guild, channelId } = interaction
+      if (!channelId) {
+        console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
+        await interaction.reply('channelId が存在しません。管理者にご連絡ください。')
+        return
+      }
       if (!guildId) {
         console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
         await interaction.reply('guildId が存在しません。管理者にご連絡ください。')
@@ -65,11 +74,38 @@ const createRegisterModalHandler = (rule: SplatRuleSet): ModalCommandHandler => 
 
       messages.push(`ユーザー ${name} の ${rulename} のレーティングが登録されました。 初期値: ${gachipower}`)
 
-      await interaction.reply(messages.join('\n'))
+      // join room
+      const joinResult = await joinRoom(id, channelId, guildId)
+
+      if (joinResult.error) {
+        if (joinResult.error === 'ROOM_DOES_NOT_EXIST') {
+          messages.push('このチャンネルに募集中のゲームは現在ありません。')
+        } else if (joinResult.error === 'USER_ALREADY_JOINED') {
+          messages.push(`${username} さんはすでに参加しています。`)
+        } else if (joinResult.error === 'TOO_MANY_JOINED_USERS') {
+          messages.push('このチャンネルのゲームは定員を超えています。')
+        } else if (joinResult.error === 'RATING_DOES_NOT_EXIST') {
+          messages.push('(さっき登録されたはずなのになぜか)レーティングが登録されていません。')
+        } else {
+          assertNever(joinResult)
+        }
+        await interaction.reply(messages.join('\n'))
+        return
+      }
+
+      const remainMinUsersCount = Math.max(joinResult.remainMinUsersCount, 0)
+      const { remainMaxUsersCount } = joinResult
+      messages.push(`${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`)
+
+      const components = []
+      if (remainMinUsersCount === 0) components.push(createMatchButton())
+      if (remainMaxUsersCount !== 0) components.push(createJoinButton())
+
+      await interaction.reply({ content: messages.join('\n'), components })
     },
   }
 }
 
-const registerModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterModalHandler(code))
+const registerAndJoinModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterAndJoinModalHandler(code))
 
-;[...registerModalHandlers, dashHandler].forEach((handler) => handlers.set(handler.customId, handler))
+;[...registerAndJoinModalHandlers, dashHandler].forEach((handler) => handlers.set(handler.customId, handler))

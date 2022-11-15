@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
@@ -12,41 +9,56 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  name             String
-  createdAt        DateTime           @default(now())
-  ratings          Rating[]
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  ratings   Rating[]
+
   JoinedUser       JoinedUser[]
   Room             Room[]
   GameResultRating GameResultRating[]
 }
 
 model Room {
-  id               String   @id @default(cuid())
-  discordChannelId String
-  rule             String
-  createdAt        DateTime @default(now())
-  creatorUserId    String
-  creator          User     @relation(fields: [creatorUserId], references: [id])
-  watchedUserIds   String[]
+  id                     String                  @id @default(cuid())
+  discordChannelId       String
+  guildId                String
+  rule                   String
+  createdAt              DateTime                @default(now())
+  creatorUserId          String
+  creator                User                    @relation(fields: [creatorUserId], references: [id])
+  watchedUserIds         String[]
+  joinedUsers            JoinedUser[]
+  joinedUsersSeparations JoinedUsersSeparation[]
 
-  JoinedUser JoinedUser[]
-  Matching   Matching[]
+  Matching Matching[]
 
   @@unique([discordChannelId])
 }
 
 model JoinedUser {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  ratingId  String
-  rating    Rating   @relation(fields: [ratingId], references: [id])
-  roomId    String
-  room      Room     @relation(fields: [roomId], references: [id])
-  createdAt DateTime @default(now())
+  id                     String                  @id @default(cuid())
+  userId                 String
+  user                   User                    @relation(fields: [userId], references: [id])
+  ratingId               String
+  rating                 Rating                  @relation(fields: [ratingId], references: [id])
+  roomId                 String
+  room                   Room                    @relation(fields: [roomId], references: [id])
+  createdAt              DateTime                @default(now())
+  JoinedUsersSeparation1 JoinedUsersSeparation[] @relation("firstJoinedUser")
+  JoinedUsersSeparation2 JoinedUsersSeparation[] @relation("secondJoinedUser")
 
   @@unique([roomId, userId])
+}
+
+model JoinedUsersSeparation {
+  id                 String     @id @default(cuid())
+  roomId             String
+  room               Room       @relation(fields: [roomId], references: [id])
+  firstJoinedUserId  String
+  firstJoinedUser    JoinedUser @relation(fields: [firstJoinedUserId], references: [id], onDelete: Cascade, name: "firstJoinedUser")
+  secondJoinedUserId String
+  secondJoinedUser   JoinedUser @relation(fields: [secondJoinedUserId], references: [id], onDelete: Cascade, name: "secondJoinedUser")
 }
 
 model Rating {
@@ -61,22 +73,27 @@ model Rating {
   loseCount Int      @default(0)
   createdAt DateTime @default(now())
 
-  GameResultRating GameResultRating[]
-  JoinedUser       JoinedUser[]
+  GameResultRating     GameResultRating[]
+  JoinedUser           JoinedUser[]
+  seasonRecords        SeasonRecord[]
+  ratingChangedHistory RatingChangedHistory[]
 
   @@unique([userId, guildId, rule])
   @@index([guildId, rule])
 }
 
 model GameResult {
-  id                String             @id @default(cuid())
+  id                String   @id @default(cuid())
   winnerTeamRatings Json
   loserTeamRatings  Json
   beta              Float
   metadata          Json?
-  rule              String             @default("SplatZones") // remove default value later
-  createdAt         DateTime           @default(now())
-  GameResultRating  GameResultRating[]
+  rule              String   @default("SplatZones") // remove default value later
+  seasonId          String?
+  season            Season?  @relation(fields: [seasonId], references: [id])
+  createdAt         DateTime @default(now())
+
+  GameResultRating GameResultRating[]
 }
 
 model GameResultRating {
@@ -107,12 +124,60 @@ model Matching {
   metadata       Json?
   roomId         String   @unique
   room           Room     @relation(fields: [roomId], references: [id])
+  seasonId       String?
+  season         Season?  @relation(fields: [seasonId], references: [id])
   createdAt      DateTime @default(now())
 }
 
+model Season {
+  id            String         @id @default(cuid())
+  name          String
+  guildId       String
+  startAt       DateTime
+  seasonRecords SeasonRecord[]
+  matchings     Matching[]
+  gameResults   GameResult[]
+
+  RatingChangedHistory RatingChangedHistory[]
+
+  @@index([guildId, startAt])
+}
+
+model SeasonRecord {
+  id        String @id @default(cuid())
+  seasonId  String
+  season    Season @relation(fields: [seasonId], references: [id])
+  ratingId  String
+  rating    Rating @relation(fields: [ratingId], references: [id])
+  mu        Float
+  sigma     Float
+  rankPoint Float
+  winCount  Int
+  loseCount Int
+
+  @@unique([ratingId, seasonId])
+  @@index([seasonId, rankPoint])
+}
+
+model RatingChangedHistory {
+  id          String  @id @default(cuid())
+  ratingId    String
+  rating      Rating  @relation(fields: [ratingId], references: [id])
+  seasonId    String?
+  season      Season? @relation(fields: [seasonId], references: [id])
+  muBefore    Float
+  muAfter     Float
+  sigmaBefore Float
+  sigmaAfter  Float
+  reason      String?
+
+  @@index([ratingId, seasonId])
+  @@index([seasonId])
+}
+
 model Session {
-  id          String @id
-  sid         String @unique
-  data        String
-  expiresAt   DateTime
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 }

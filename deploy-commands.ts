@@ -71,6 +71,12 @@ const commands = [
     .setName('sr-make-leave')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
     .setDescription('他ユーザーをゲームから抜けさせる'),
+  new SlashCommandBuilder()
+    .setName('sr-separate')
+    .addMentionableOption((option) => option.setName('user1').setDescription('対象ユーザ1').setRequired(true))
+    .addMentionableOption((option) => option.setName('user2').setDescription('対象ユーザ2').setRequired(true))
+    .setDescription('ユーザーのチーム分離の設定をする'),
+  new SlashCommandBuilder().setName('sr-separation-reset').setDescription('ユーザーのチーム分離の設定を解除する'),
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)

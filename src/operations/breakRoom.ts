@@ -22,6 +22,7 @@ export const breakRoom = async (userId: string, discordChannelId: string) => {
   }
 
   await prisma.$transaction(async (prisma) => {
+    await prisma.joinedUsersSeparation.deleteMany({ where: { roomId: room.id } })
     await prisma.joinedUser.deleteMany({ where: { roomId: room.id } })
     await prisma.room.delete({ where: { id: room.id } })
   })

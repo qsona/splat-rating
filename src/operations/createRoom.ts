@@ -20,6 +20,7 @@ export const createRoom = async (creatorUserId: string, discordChannelId: string
           discordChannelId,
           creatorUserId: creatorUserId,
           rule,
+          guildId,
         },
       })
     } catch (e) {

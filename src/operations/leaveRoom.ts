@@ -25,11 +25,9 @@ export const leaveRoom = async (userId: string, discordChannelId: string) => {
     return 'USER_NOT_JOINED'
   }
 
-  await prisma.joinedUser.delete({
-    where: {
-      id: joinedUser.id,
-    },
-  })
+  await prisma.joinedUsersSeparation.deleteMany({ where: { firstJoinedUserId: joinedUser.id } })
+  await prisma.joinedUsersSeparation.deleteMany({ where: { secondJoinedUserId: joinedUser.id } })
+  await prisma.joinedUser.delete({ where: { id: joinedUser.id } })
 
   const joinedUsersCount = await prisma.joinedUser.count({
     where: {
