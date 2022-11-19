@@ -16,6 +16,8 @@ import pingHandler from './src/commands/ping'
 import separateHandler from './src/commands/separate'
 import separationResetHandler from './src/commands/separation-reset'
 
+import { tksPartyHandler, tksRecruitHandler } from './src/commands/tks'
+
 import { execute as executeButtonHandlers } from './src/commands/buttonHandlers'
 import { execute as executeModalHandlers } from './src/commands/modalHandlers'
 
@@ -68,6 +70,8 @@ const helpHandler: CommandHandler = {
   helpHandler,
   separateHandler,
   separationResetHandler,
+  tksRecruitHandler,
+  tksPartyHandler,
 ].forEach((handler) => {
   handlers.set(handler.commandName, handler)
 })
