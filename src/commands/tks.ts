@@ -23,7 +23,7 @@ export const createTksRecruitModal = () => {
   const modal = new ModalBuilder().setCustomId(`modal-tks-recruit`).setTitle('対抗戦味方募集')
   const input = new TextInputBuilder()
     .setCustomId('description')
-    .setLabel('募集の説明 (自分のウデマエ/パワー目安、持ちブキ、希望するウデマエ/パワー目安、開始時間など)')
+    .setLabel('募集の説明 (自分のパワー目安、持ちブキ、希望するパワー目安、開始時間など)') // length must be <45
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph)
   const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input)
