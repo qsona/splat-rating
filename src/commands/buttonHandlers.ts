@@ -3,12 +3,27 @@ import { joinButtonHandler } from './join'
 import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
 import { matchButtonHandler } from './match'
 
+import {
+  tksRoomJoinButtonHandler,
+  tksSetTeamNameButtonHandler,
+  tksBreakPartyButtonHandler,
+  tksFindOpponentButtonHandler,
+  tksMatchButtonHandler,
+  tksReportButtonHandler,
+} from './tks'
+
 export type ButtonCommandHandler = {
   customId: string
   execute: (interaction: ButtonInteraction) => Promise<void>
 }
 
+export type ButtonCommandWithDataHandler = {
+  customId: string
+  execute: (interaction: ButtonInteraction, data: string) => Promise<void>
+}
+
 const handlers = new Map<string, ButtonCommandHandler>()
+const withDataHandlers = new Map<string, ButtonCommandWithDataHandler>()
 
 export const execute = async (interaction: ButtonInteraction) => {
   const { customId } = interaction
@@ -19,6 +34,16 @@ export const execute = async (interaction: ButtonInteraction) => {
   if (handler) {
     await handler.execute(interaction)
   }
+
+  // customId@data
+  const result = customId.match(/(.+?)@(.+)/)
+  if (result) {
+    const handler = withDataHandlers.get(result[1])
+    if (handler) {
+      await handler.execute(interaction, result[2])
+    }
+  }
+
   return
 }
 
@@ -44,3 +69,11 @@ const jumpHandler: ButtonCommandHandler = {
 ;[joinButtonHandler, reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler, matchButtonHandler, dashHandler, jumpHandler].forEach(
   (handler) => handlers.set(handler.customId, handler)
 )
+;[
+  tksRoomJoinButtonHandler,
+  tksSetTeamNameButtonHandler,
+  tksBreakPartyButtonHandler,
+  tksFindOpponentButtonHandler,
+  tksMatchButtonHandler,
+  tksReportButtonHandler,
+].forEach((handler) => withDataHandlers.set(handler.customId, handler))

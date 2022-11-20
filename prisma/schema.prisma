@@ -14,9 +14,12 @@ model User {
   createdAt DateTime @default(now())
   ratings   Rating[]
 
-  JoinedUser       JoinedUser[]
-  Room             Room[]
-  GameResultRating GameResultRating[]
+  JoinedUser            JoinedUser[]
+  Room                  Room[]
+  GameResultRating      GameResultRating[]
+  TksTeamUser           TksTeamUser[]
+  TksRecruitingRoom     TksRecruitingRoom[]
+  TksRecruitingRoomUser TksRecruitingRoomUser?
 }
 
 model Room {
@@ -180,4 +183,83 @@ model Session {
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model TksRecruitingRoom {
+  id                  String                  @id @default(cuid())
+  createdAt           DateTime                @default(now())
+  creatorUserId       String
+  creator             User                    @relation(fields: [creatorUserId], references: [id])
+  recruitingRoomUsers TksRecruitingRoomUser[]
+}
+
+model TksRecruitingRoomUser {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  user             User              @relation(fields: [userId], references: [id])
+  recruitingRoomId String
+  recruitingRoom   TksRecruitingRoom @relation(fields: [recruitingRoomId], references: [id], onDelete: Cascade)
+}
+
+model TksTeam {
+  id              String           @id
+  name            String?
+  tksTeamUsers    TksTeamUser[]
+  TksParty        TksParty?
+  TksMatch1       TksMatch[]       @relation("primaryTeam1")
+  TksMatch2       TksMatch[]       @relation("opponentTeam1")
+  TksMatchResult1 TksMatchResult[] @relation("primaryTeam")
+  TksMatchResult2 TksMatchResult[] @relation("opponentTeam")
+}
+
+model TksTeamUser {
+  id     String  @id @default(cuid())
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  teamId String
+  team   TksTeam @relation(fields: [teamId], references: [id])
+
+  @@unique([userId, teamId])
+  @@index([teamId])
+}
+
+model TksParty {
+  id                 String               @id @default(cuid())
+  teamId             String               @unique
+  team               TksTeam              @relation(fields: [teamId], references: [id])
+  TksFindingOpponent TksFindingOpponent[]
+}
+
+model TksFindingOpponent {
+  id              String   @id @default(cuid())
+  partyId         String   @unique
+  party           TksParty @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  rule            String
+  winCountOfMatch Int
+  description     String?
+}
+
+model TksMatch {
+  id              String   @id @default(cuid())
+  primaryTeamId   String
+  primaryTeam     TksTeam  @relation(fields: [primaryTeamId], references: [id], name: "primaryTeam1")
+  opponentTeamId  String
+  opponentTeam    TksTeam  @relation(fields: [opponentTeamId], references: [id], name: "opponentTeam1")
+  rule            String
+  winCountOfMatch Int
+  createdAt       DateTime @default(now())
+}
+
+model TksMatchResult {
+  id               String   @id @default(cuid())
+  primaryTeamId    String
+  primaryTeam      TksTeam  @relation(fields: [primaryTeamId], references: [id], name: "primaryTeam")
+  opponentTeamId   String
+  opponentTeam     TksTeam  @relation(fields: [opponentTeamId], references: [id], name: "opponentTeam")
+  rule             String
+  winCountOfMatch  Int
+  primaryWinCount  Int
+  opponentWinCount Int
+  matchStartedAt   DateTime
+  matchEndedAt     DateTime @default(now())
 }
