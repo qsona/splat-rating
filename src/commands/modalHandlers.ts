@@ -5,7 +5,7 @@ import { joinRoom } from '../operations/joinRoom'
 import { SplatRuleSet, getRuleName, SPLAT_RULES_NAME_MAP } from '../rules'
 import { inspectRating } from '../inspectors'
 import { createJoinButton, createMatchButton } from './helpers/buttons'
-import { tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler } from './tks'
+import { tksRecruitModalHandler, tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler } from './tks'
 
 export type ModalCommandHandler = {
   customId: string
@@ -123,5 +123,5 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
 
 const registerAndJoinModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterAndJoinModalHandler(code))
 
-;[...registerAndJoinModalHandlers, dashHandler].forEach((handler) => handlers.set(handler.customId, handler))
+;[...registerAndJoinModalHandlers, dashHandler, tksRecruitModalHandler].forEach((handler) => handlers.set(handler.customId, handler))
 ;[tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler].forEach((handler) => withDataHandlers.set(handler.customId, handler))

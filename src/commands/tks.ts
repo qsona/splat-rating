@@ -5,11 +5,10 @@ import assertNever from 'assert-never'
 import { prisma } from '../prismaClient'
 import { ButtonCommandWithDataHandler } from './buttonHandlers'
 import hash from 'object-hash'
-import { ModalCommandWithDataHandler } from './modalHandlers'
+import { ModalCommandHandler, ModalCommandWithDataHandler } from './modalHandlers'
 import { getUserFromMentionable } from './helpers/mentionable'
 import { uniq } from 'lodash'
 import { SplatRuleSet, getRuleName } from '../rules'
-import { match } from 'assert'
 
 export const calcTeamId = (userIds: string[]) => {
   return hash(userIds, { unorderedArrays: true })
@@ -19,6 +18,18 @@ const recruitingChannelId = '1043582923644874784'
 const findingOpponentChannelId = '1043583020457807982'
 
 // button and modals
+
+export const createTksRecruitModal = () => {
+  const modal = new ModalBuilder().setCustomId(`modal-tks-recruit`).setTitle('対抗戦味方募集')
+  const input = new TextInputBuilder()
+    .setCustomId('description')
+    .setLabel('募集の説明 (自分のウデマエ/パワー目安、持ちブキ、希望するウデマエ/パワー目安、開始時間など)')
+    .setRequired(false)
+    .setStyle(TextInputStyle.Paragraph)
+  const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input)
+  modal.addComponents(firstActionRow)
+  return modal
+}
 
 export const createTksRoomJoinButton = (tksRecruitingRoomId: string) => {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -63,7 +74,7 @@ export const createTksFindOpponentModal = (partyId: string) => {
   const winCountOfMatchInput = new TextInputBuilder().setCustomId('winCountOfMatch').setLabel('N本先取(整数)').setRequired(true).setStyle(TextInputStyle.Short)
   const descriptionInput = new TextInputBuilder()
     .setCustomId('description')
-    .setLabel('募集の説明 (パーティーの強さ目安、対戦相手への希望、開始時間など)')
+    .setLabel('募集の説明 (パーティーのウデマエ/パワー目安、対戦相手への希望、開始時間など)')
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph)
   const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(winCountOfMatchInput)
@@ -110,15 +121,42 @@ export const tksRecruitHandler: CommandHandler = {
   execute: async (interaction) => {
     const { id, username } = interaction.user
 
-    // TODO: const isAlreadyRecruiting =
+    const isAlreadyRecruiting = await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } })
+    if (isAlreadyRecruiting) {
+      await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
+      return
+    }
+    await interaction.showModal(createTksRecruitModal())
+  },
+}
+
+export const tksRecruitModalHandler: ModalCommandHandler = {
+  customId: 'modal-tks-recruit',
+  execute: async (interaction) => {
+    const { id, username } = interaction.user
+
+    const isAlreadyRecruiting = await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } })
+    if (isAlreadyRecruiting) {
+      await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
+      return
+    }
+
+    const description = interaction.fields.getTextInputValue('description') || null
+
     const { tksRecruitingRoom } = await prisma.$transaction(async (prisma) => {
       await prisma.user.upsert({ where: { id }, update: {}, create: { id, name: username } })
-      const tksRecruitingRoom = await prisma.tksRecruitingRoom.create({ data: { creatorUserId: id } })
+      const tksRecruitingRoom = await prisma.tksRecruitingRoom.create({
+        data: {
+          creatorUserId: id,
+          description,
+        },
+      })
       await prisma.tksRecruitingRoomUser.create({ data: { userId: id, recruitingRoomId: tksRecruitingRoom.id } })
       return { tksRecruitingRoom }
     })
-    const message = [`${username}: 対抗戦味方募集@3`, '強い人', '募集垢❌'].join('\n')
-    await interaction.reply({ content: message, components: [createTksRoomJoinButton(tksRecruitingRoom.id)] })
+    const messages = ['@everyone', `${username}: 対抗戦味方募集@3`]
+    if (description) messages.push(description)
+    await interaction.reply({ content: messages.join('\n'), components: [createTksRoomJoinButton(tksRecruitingRoom.id)] })
   },
 }
 
@@ -146,8 +184,9 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
 
     if (users.length < 3) {
       await prisma.tksRecruitingRoomUser.create({ data: { recruitingRoomId: room.id, userId: id } })
-      const message = [`${username} が参加しました。`, `対抗戦味方募集@${3 - users.length}`, '強い人', '募集垢❌'].join('\n')
-      await interaction.reply({ content: message, components: [createTksRoomJoinButton(tksRecruitingRoomId)] })
+      const messages = [`${username} が参加しました。`, `@everyone 対抗戦味方募集@${3 - users.length}`]
+      if (room.description) messages.push(room.description)
+      await interaction.reply({ content: messages.join('\n'), components: [createTksRoomJoinButton(tksRecruitingRoomId)] })
       return
     }
 
