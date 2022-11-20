@@ -1,7 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js'
 
 import { CommandHandler } from '../../bot'
-import assertNever from 'assert-never'
 import { prisma } from '../prismaClient'
 import { ButtonCommandWithDataHandler } from './buttonHandlers'
 import hash from 'object-hash'
@@ -29,6 +28,18 @@ export const createTksRecruitModal = () => {
   const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input)
   modal.addComponents(firstActionRow)
   return modal
+}
+
+export const createTksLeaveRoomButton = (tksRecruitingRoomId: string) => {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder().setCustomId(`button-tks-leave-room-@${tksRecruitingRoomId}`).setLabel('抜ける').setStyle(ButtonStyle.Secondary)
+  )
+}
+
+export const createTksBreakRoomButton = (tksRecruitingRoomId: string) => {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder().setCustomId(`button-tks-break-room@${tksRecruitingRoomId}`).setLabel('解散').setStyle(ButtonStyle.Danger)
+  )
 }
 
 export const createTksRoomJoinButton = (tksRecruitingRoomId: string) => {
@@ -156,7 +167,10 @@ export const tksRecruitModalHandler: ModalCommandHandler = {
     })
     const messages = ['@everyone', `${username}: 対抗戦味方募集@3`]
     if (description) messages.push(description)
-    await interaction.reply({ content: messages.join('\n'), components: [createTksRoomJoinButton(tksRecruitingRoom.id)] })
+    await interaction.reply({
+      content: messages.join('\n'),
+      components: [createTksRoomJoinButton(tksRecruitingRoom.id), createTksBreakRoomButton(tksRecruitingRoom.id)],
+    })
   },
 }
 
@@ -186,7 +200,10 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
       await prisma.tksRecruitingRoomUser.create({ data: { recruitingRoomId: room.id, userId: id } })
       const messages = [`${username} が参加しました。`, `@everyone 対抗戦味方募集@${3 - users.length}`]
       if (room.description) messages.push(room.description)
-      await interaction.reply({ content: messages.join('\n'), components: [createTksRoomJoinButton(tksRecruitingRoomId)] })
+      await interaction.reply({
+        content: messages.join('\n'),
+        components: [createTksRoomJoinButton(tksRecruitingRoomId), createTksLeaveRoomButton(tksRecruitingRoomId)],
+      })
       return
     }
 
@@ -264,6 +281,46 @@ export const tksSetTeamNameModalHandler: ModalCommandWithDataHandler = {
     await interaction.reply({
       content: `チーム名を${team.name == null ? '登録' : '変更'}しました: ${teamName}`,
     })
+  },
+}
+
+export const tksLeaveRoomButtonHandler: ButtonCommandWithDataHandler = {
+  customId: 'button-tks-leave-room',
+  execute: async (interaction, tksRecruitingRoomId) => {
+    const { user } = interaction
+    const room = await prisma.tksRecruitingRoom.findUnique({
+      where: { id: tksRecruitingRoomId },
+      include: { recruitingRoomUsers: true },
+    })
+    if (!room) {
+      await interaction.reply('その募集はすでに解散しています。')
+      return
+    }
+    const roomUser = room.recruitingRoomUsers.find((ru) => ru.userId === user.id)
+    if (!roomUser) {
+      await interaction.reply(`${user.username} はこの募集に参加していません。`)
+      return
+    }
+    await prisma.tksRecruitingRoomUser.delete({ where: { id: roomUser.id } })
+    await interaction.reply(`${user.username} が募集から抜けました。`)
+  },
+}
+
+export const tksBreakRoomButtonHandler: ButtonCommandWithDataHandler = {
+  customId: 'button-tks-break-room',
+  execute: async (interaction, tksRecruitingRoomId) => {
+    const { user } = interaction
+    const room = await prisma.tksRecruitingRoom.findUnique({ where: { id: tksRecruitingRoomId } })
+    if (!room) {
+      await interaction.reply('その募集はすでに解散しています。')
+      return
+    }
+    if (room.creatorUserId !== user.id) {
+      await interaction.reply(`${user.username} はこの募集のホストではありません。`)
+      return
+    }
+    await prisma.tksRecruitingRoom.delete({ where: { id: tksRecruitingRoomId } })
+    await interaction.reply('募集を解散しました。')
   },
 }
 

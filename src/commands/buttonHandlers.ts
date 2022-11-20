@@ -5,6 +5,8 @@ import { matchButtonHandler } from './match'
 
 import {
   tksRoomJoinButtonHandler,
+  tksLeaveRoomButtonHandler,
+  tksBreakRoomButtonHandler,
   tksSetTeamNameButtonHandler,
   tksBreakPartyButtonHandler,
   tksFindOpponentButtonHandler,
@@ -71,6 +73,8 @@ const jumpHandler: ButtonCommandHandler = {
 )
 ;[
   tksRoomJoinButtonHandler,
+  tksLeaveRoomButtonHandler,
+  tksBreakRoomButtonHandler,
   tksSetTeamNameButtonHandler,
   tksBreakPartyButtonHandler,
   tksFindOpponentButtonHandler,
