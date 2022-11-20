@@ -190,6 +190,7 @@ model TksRecruitingRoom {
   createdAt           DateTime                @default(now())
   creatorUserId       String
   creator             User                    @relation(fields: [creatorUserId], references: [id])
+  description         String?
   recruitingRoomUsers TksRecruitingRoomUser[]
 }
 
