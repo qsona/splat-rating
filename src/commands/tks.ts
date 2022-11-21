@@ -32,7 +32,7 @@ export const createTksRecruitModal = () => {
 
 export const createTksLeaveRoomButton = (tksRecruitingRoomId: string) => {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder().setCustomId(`button-tks-leave-room-@${tksRecruitingRoomId}`).setLabel('抜ける').setStyle(ButtonStyle.Secondary)
+    new ButtonBuilder().setCustomId(`button-tks-leave-room@${tksRecruitingRoomId}`).setLabel('抜ける').setStyle(ButtonStyle.Secondary)
   )
 }
 
