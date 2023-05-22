@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<%- include('components/head'); %>
+<body class="bg-gradient-primary">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-12 col-xl-10">
+                <div class="card shadow-lg o-hidden border-0 my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-6 m-auto">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h4 class="text-dark mb-4">Splat-Rating Wiki</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="p-10">
+                                    <%- content %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 m-auto">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <% if (isLoggedIn) { %>
+                                            <a href="/docs/edit" id="btnEdit" class="btn btn-primary btn-user w-25" type="button">編集する</a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('components/footer-scripts'); %>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<%- include('components/head'); %>
+
+<body id="page-top">
+    <div id="wrapper">
+        <%- include('components/left-nav', { active: 'profile', loginUser: loginUser }); %>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <%- include('components/head-nav', { loginUser: loginUser }); %>
+                <div class="container-fluid">
+                    <h3 class="text-dark mb-4">Edit Wiki</h3>
+                    <div class="row mb-3">
+                        <div class="col-mb-12">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card shadow mb-3">
+                                        <div class="card-header py-3">
+                                            <p class="text-primary m-0 fw-bold">Splat-Rating Wiki</p>
+                                        </div>
+                                        <div class="card-body">
+                                            <form method="POST">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <textarea name="content" id="editor"><%- content %></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="m-3"><button class="btn btn-primary btn-sm" type="submit">保存</button></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include('components/footer'); %>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <%- include('components/footer-scripts'); %>
+    <script src="https://cdn.ckeditor.com/ckeditor5/38.0.0/classic/ckeditor.js"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#editor'))
+            .then(editor => {
+                console.log(editor);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+</body>
+
+</html>

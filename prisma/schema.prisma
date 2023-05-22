@@ -264,3 +264,10 @@ model TksMatchResult {
   matchStartedAt   DateTime
   matchEndedAt     DateTime @default(now())
 }
+
+model Wiki {
+  id                String    @id @default(cuid())
+  content           String    @db.Text
+  userId            String
+  updatedAt         DateTime  @default(now())
+}
