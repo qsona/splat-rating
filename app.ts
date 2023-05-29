@@ -189,7 +189,11 @@ app.get('/admin/ranking/:id', isAuthenticated, async (req, res) => {
 
 app.get('/docs', async (req, res) => {
   const isLoggedIn = req.isAuthenticated()
-  const result = await prisma.wiki.findFirst({})
+  const result = await prisma.wiki.findFirst({
+    orderBy: {
+      updatedAt: 'desc'
+    }
+  })
   const content = result !== null ? result.content : null
   res.render('docs', { isLoggedIn: isLoggedIn, content: content })
 })
@@ -210,15 +214,31 @@ app.post('/docs/edit', isAuthenticated, async (req, res) => {
   if (!loginUser) {
     return res.status(404).send('User Not Found')
   }
-  
-  const content = String(req.body.content)
   // TODO: do validate & csrf token check
-  const result = await prisma.wiki.create({
-    data: {
-      content: content,
-      userId: loginUser.id
+  const content = String(req.body.content)
+  const oldData = await prisma.wiki.findFirst({
+    orderBy: {
+      updatedAt: 'desc'
     }
   })
+  if (oldData) {
+    const result = await prisma.wiki.update({
+      where: {
+        id: oldData.id
+      },
+      data: {
+        content: content,
+        userId: loginUser.id
+      }
+    })
+  } else {
+    const result = await prisma.wiki.create({
+      data: {
+        content: content,
+        userId: loginUser.id
+      }
+    })
+  }
   res.redirect('/docs/edit')
 })
 
