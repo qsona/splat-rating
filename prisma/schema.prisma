@@ -20,6 +20,7 @@ model User {
   TksTeamUser           TksTeamUser[]
   TksRecruitingRoom     TksRecruitingRoom[]
   TksRecruitingRoomUser TksRecruitingRoomUser?
+  Wiki                  Wiki[]
 }
 
 model Room {
@@ -266,8 +267,11 @@ model TksMatchResult {
 }
 
 model Wiki {
-  id                String    @id @default(cuid())
-  content           String    @db.Text
-  userId            String
-  updatedAt         DateTime  @default(now())
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime @default(now())
+
+  @@index([userId])
 }

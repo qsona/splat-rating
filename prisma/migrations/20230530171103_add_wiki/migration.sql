@@ -7,3 +7,9 @@ CREATE TABLE "Wiki" (
 
     CONSTRAINT "Wiki_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE INDEX "Wiki_userId_idx" ON "Wiki"("userId");
+
+-- AddForeignKey
+ALTER TABLE "Wiki" ADD CONSTRAINT "Wiki_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
