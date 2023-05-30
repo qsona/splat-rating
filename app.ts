@@ -187,6 +187,61 @@ app.get('/admin/ranking/:id', isAuthenticated, async (req, res) => {
   res.render('ranking', { loginUser, user, isAdmin: isAdmin(req), rankingData, rules: SPLAT_RULES_NAME_MAP })
 })
 
+app.get('/docs', async (req, res) => {
+  const isLoggedIn = req.isAuthenticated()
+  const result = await prisma.wiki.findFirst({
+    orderBy: {
+      updatedAt: 'desc'
+    }
+  })
+  const content = result !== null ? result.content : null
+  res.render('docs', { isLoggedIn: isLoggedIn, content: content })
+})
+
+app.get('/docs/edit', isAuthenticated, async (req, res) => {
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+
+  const result = await prisma.wiki.findFirst({})
+  const content = result !== null ? result.content : null
+  res.render('docs-edit', { loginUser, isAdmin: isAdmin(req), content: content })
+})
+
+app.post('/docs/edit', isAuthenticated, async (req, res) => {
+  const loginUser = await getLoginUser(req)
+  if (!loginUser) {
+    return res.status(404).send('User Not Found')
+  }
+  // TODO: do validate & csrf token check
+  const content = String(req.body.content)
+  const oldData = await prisma.wiki.findFirst({
+    orderBy: {
+      updatedAt: 'desc'
+    }
+  })
+  if (oldData) {
+    const result = await prisma.wiki.update({
+      where: {
+        id: oldData.id
+      },
+      data: {
+        content: content,
+        userId: loginUser.id
+      }
+    })
+  } else {
+    const result = await prisma.wiki.create({
+      data: {
+        content: content,
+        userId: loginUser.id
+      }
+    })
+  }
+  res.redirect('/docs/edit')
+})
+
 const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URL } = process.env
 if (!DISCORD_CLIENT_ID) throw new Error('DISCORD_CLIENT_ID is not set')
 if (!DISCORD_CLIENT_SECRET) throw new Error('DISCORD_CLIENT_SECRET is not set')
