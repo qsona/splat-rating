@@ -1,0 +1,37 @@
+name: test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+#    strategy:
+#      matrix:
+#        node-version: [18.x]
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: splat-rating-test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js # ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x #${{ matrix.node-version }}
+      - run: echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/splat-rating-test" >> $GITHUB_ENV
+      - run: npm install
+      - run: npx prisma generate
+      - run: npx prisma migrate dev
+      - run: npm test
+
