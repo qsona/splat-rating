@@ -3,7 +3,7 @@ import passport from 'passport'
 import { prisma } from './src/prismaClient'
 import { SPLAT_RULES_NAME_MAP } from './src/rules'
 import { Strategy as DiscordStrategy } from 'passport-discord'
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { Profile } from './src/models/profile'
 
 require('dotenv').config()
@@ -27,13 +27,11 @@ app.use(
     name: 'session',
     resave: false,
     saveUninitialized: true,
-    store: new PrismaSessionStore(
-      new PrismaClient(), {
-        checkPeriod: 2 * 60 * 1000,
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }
-    )
+    store: new PrismaSessionStore(new PrismaClient(), {
+      checkPeriod: 2 * 60 * 1000,
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
   })
 )
 app.use(passport.initialize())
@@ -64,9 +62,13 @@ app.get('/test', isAuthenticated, (req, res) => {
 app.get('/login', (req, res) => {
   res.render('login')
 })
-app.get('/logout', (req, res) => {
-  req.logout()
-  res.redirect('/login')
+app.get('/logout', (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err)
+    }
+    res.redirect('/login')
+  })
 })
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
@@ -191,8 +193,8 @@ app.get('/docs', async (req, res) => {
   const isLoggedIn = req.isAuthenticated()
   const result = await prisma.wiki.findFirst({
     orderBy: {
-      updatedAt: 'desc'
-    }
+      updatedAt: 'desc',
+    },
   })
   const content = result !== null ? result.content : null
   res.render('docs', { isLoggedIn: isLoggedIn, content: content })
@@ -218,25 +220,25 @@ app.post('/docs/edit', isAuthenticated, async (req, res) => {
   const content = String(req.body.content)
   const oldData = await prisma.wiki.findFirst({
     orderBy: {
-      updatedAt: 'desc'
-    }
+      updatedAt: 'desc',
+    },
   })
   if (oldData) {
     const result = await prisma.wiki.update({
       where: {
-        id: oldData.id
+        id: oldData.id,
       },
       data: {
         content: content,
-        userId: loginUser.id
-      }
+        userId: loginUser.id,
+      },
     })
   } else {
     const result = await prisma.wiki.create({
       data: {
         content: content,
-        userId: loginUser.id
-      }
+        userId: loginUser.id,
+      },
     })
   }
   res.redirect('/docs/edit')
