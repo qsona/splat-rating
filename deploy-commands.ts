@@ -14,7 +14,7 @@ if (!token || !guildId || !clientId) {
 
 const commands = [
   new SlashCommandBuilder().setName('sr-ping').setDescription('Replies with pong!'),
-  new SlashCommandBuilder().setName('sr-help').setDescription('ヘルプを表示します'),
+  // new SlashCommandBuilder().setName('sr-help').setDescription('ヘルプを表示します'),
   new SlashCommandBuilder()
     .setName('sr-register')
     .addStringOption((option) =>
@@ -36,37 +36,37 @@ const commands = [
         .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
         .setRequired(true)
     ),
-  new SlashCommandBuilder().setName('sr-join').setDescription('ゲームに参加する'),
-  new SlashCommandBuilder().setName('sr-leave').setDescription('ゲームから抜ける'),
+  // new SlashCommandBuilder().setName('sr-join').setDescription('ゲームに参加する'),
+  // new SlashCommandBuilder().setName('sr-leave').setDescription('ゲームから抜ける'),
   new SlashCommandBuilder().setName('sr-break').setDescription('ゲームを解散する'),
-  new SlashCommandBuilder().setName('sr-match').setDescription('自動チーム分けを行う'),
+  // new SlashCommandBuilder().setName('sr-match').setDescription('自動チーム分けを行う'),
   new SlashCommandBuilder().setName('sr-display').setDescription('現在のゲーム情報を表示する'),
-  new SlashCommandBuilder()
-    .setName('sr-report')
-    .setDescription('結果を報告/キャンセルする')
-    .addStringOption((option) =>
-      option
-        .setName('result')
-        .setDescription('勝敗')
-        .addChoices({ name: 'win', value: 'win' }, { name: 'lose', value: 'lose' }, { name: 'cancel', value: 'cancel' })
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName('sr-make-register')
-    .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
-    .addStringOption((option) =>
-      option
-        .setName('rule')
-        .setDescription('ルール種別')
-        .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
-        .setRequired(true)
-    )
-    .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
-    .setDescription('他ユーザーをレーティング登録させる'),
-  new SlashCommandBuilder()
-    .setName('sr-make-join')
-    .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
-    .setDescription('他ユーザーをゲームに参加させる'),
+  // new SlashCommandBuilder()
+  //   .setName('sr-report')
+  //   .setDescription('結果を報告/キャンセルする')
+  //   .addStringOption((option) =>
+  //     option
+  //       .setName('result')
+  //       .setDescription('勝敗')
+  //       .addChoices({ name: 'win', value: 'win' }, { name: 'lose', value: 'lose' }, { name: 'cancel', value: 'cancel' })
+  //       .setRequired(true)
+  //   ),
+  // new SlashCommandBuilder()
+  //   .setName('sr-make-register')
+  //   .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
+  //   .addStringOption((option) =>
+  //     option
+  //       .setName('rule')
+  //       .setDescription('ルール種別')
+  //       .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
+  //       .setRequired(true)
+  //   )
+  //   .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
+  //   .setDescription('他ユーザーをレーティング登録させる'),
+  // new SlashCommandBuilder()
+  //   .setName('sr-make-join')
+  //   .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
+  //   .setDescription('他ユーザーをゲームに参加させる'),
   new SlashCommandBuilder()
     .setName('sr-make-leave')
     .addMentionableOption((option) => option.setName('user').setDescription('対象ユーザ').setRequired(true))
