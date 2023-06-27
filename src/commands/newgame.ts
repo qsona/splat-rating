@@ -30,7 +30,7 @@ const handler: CommandHandler = {
 
     await interaction.reply({
       content: `ゲーム募集 ${ruleName} ホスト: ${username} (${inspectRating(result.rating.mu)}) @7~9`,
-      components: [createJoinButton(), createLeaveButton()],
+      components: [createJoinButton()],
     })
   },
 }

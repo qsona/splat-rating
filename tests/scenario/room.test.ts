@@ -71,9 +71,8 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(2)
+          expect(options.components).toHaveLength(1)
           expect(getCustomId(options.components![0])).toBe('button-join')
-          expect(getCustomId(options.components![1])).toBe('button-leave')
 
           expect(options).toMatchSnapshot()
         }
