@@ -7,7 +7,7 @@ module.exports = {
   testEnvironment: '@quramy/jest-prisma-node/environment',
   testEnvironmentOptions: {
     databaseUrl: process.env.DATABASE_URL, //'postgresql://qsona@localhost:5432/splat-rating-test',
-    enableExperimentalRollbackInTransaction: true,
+    // enableExperimentalRollbackInTransaction: true,
   },
   setupFiles: ['./test-setup.js'],
   setupFilesAfterEnv: ['./test-setup-after-env.js'],
