@@ -76,7 +76,7 @@ const helpHandler: CommandHandler = {
   handlers.set(handler.commandName, handler)
 })
 
-client.on('interactionCreate', async (interaction) => {
+export const onInteractionCreated = async (interaction: Interaction) => {
   // if (interaction.type !== InteractionType.ApplicationCommand) {
   if (interaction.isChatInputCommand()) {
     const { commandName } = interaction
@@ -99,4 +99,6 @@ client.on('interactionCreate', async (interaction) => {
     await executeModalHandlers(interaction)
     return
   }
-})
+}
+
+client.on('interactionCreate', onInteractionCreated)
