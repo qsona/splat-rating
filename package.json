@@ -49,6 +49,6 @@
     "prisma": "^4.11.0",
     "ts-jest": "*",
     "ts-node": "*",
-    "typescript": "^4.9.0"
+    "typescript": "^5.1.3"
   }
 }
