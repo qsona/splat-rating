@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`room scenario room scenario 1`] = `
+{
+  "components": [
+    {
+      "components": [
+        {
+          "custom_id": "button-join",
+          "emoji": undefined,
+          "label": "参加",
+          "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+  ],
+  "content": "ゲーム募集 ガチエリア ホスト: username1 (R2000) @7~9",
+}
+`;
+
+exports[`room scenario room scenario 2`] = `
+{
+  "components": [
+    {
+      "components": [
+        {
+          "custom_id": "button-join",
+          "emoji": undefined,
+          "label": "参加",
+          "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+  ],
+  "content": "username2 さんがゲームに参加しました。 (R2100)
+@6~8",
+}
+`;
+
+exports[`room scenario room scenario 3`] = `
+{
+  "content": "username2 さんがゲームから抜けました。
+@7~9",
+}
+`;
+
+exports[`room scenario room scenario 4`] = `
+{
+  "components": [
+    {
+      "components": [
+        {
+          "custom_id": "button-match",
+          "emoji": undefined,
+          "label": "チーム分け",
+          "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+    {
+      "components": [
+        {
+          "custom_id": "button-join",
+          "emoji": undefined,
+          "label": "参加",
+          "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+  ],
+  "content": "username8 さんがゲームに参加しました。 (R2700)
+@0~2",
+}
+`;
+
+exports[`room scenario room scenario 5`] = `
+{
+  "content": "username2 さんがゲームから抜けました。
+@1~3",
+}
+`;
+
+exports[`room scenario room scenario 6`] = `
+{
+  "components": [
+    {
+      "components": [
+        {
+          "custom_id": "button-match",
+          "emoji": undefined,
+          "label": "チーム分け",
+          "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+  ],
+  "content": "username10 さんがゲームに参加しました。 (R2900)
+@0~0",
+}
+`;
+
+exports[`room scenario room scenario 7`] = `
+{
+  "content": "このチャンネルのゲームを解散しました。",
+}
+`;
