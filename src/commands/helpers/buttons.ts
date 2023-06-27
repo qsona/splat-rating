@@ -3,6 +3,11 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 export const createJoinButton = () => {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('button-join').setLabel('参加').setStyle(ButtonStyle.Primary))
 }
+
+export const createLeaveButton = () => {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('button-leave').setLabel('抜ける').setStyle(ButtonStyle.Secondary))
+}
+
 export const createMatchButton = () => {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder().setCustomId('button-match').setLabel('チーム分け').setStyle(ButtonStyle.Primary)

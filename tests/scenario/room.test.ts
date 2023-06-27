@@ -55,27 +55,6 @@ describe('room scenario', () => {
     const user9 = await registerUserAndRating('user9', 'username9', guildId, 'SplatZones', 2800)
     const user10 = await registerUserAndRating('user10', 'username10', guildId, 'SplatZones', 2900)
 
-    // await onInteractionCreated(
-    //   createChatInputInteraction(
-    //     'sr-register',
-    //     {
-    //       channelId,
-    //       guildId,
-    //       user: {
-    //         id: 'user1',
-    //         username: 'username1',
-    //       },
-    //       options: {
-    //         getString: () => 'SplatZones', // TODO: use mock
-    //         getNumber: () => 2000,
-    //       },
-    //     },
-    //     (options) => {
-    //       expect(options).toMatchSnapshot()
-    //     }
-    //   )
-    // )
-
     // new game
     await onInteractionCreated(
       createChatInputInteraction(
@@ -92,9 +71,9 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(1)
-          const component = options.components![0]
-          expect(getCustomId(component)).toBe('button-join')
+          expect(options.components).toHaveLength(2)
+          expect(getCustomId(options.components![0])).toBe('button-join')
+          expect(getCustomId(options.components![1])).toBe('button-leave')
 
           expect(options).toMatchSnapshot()
         }
@@ -122,9 +101,9 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(1)
-          const component = options.components![0]
-          expect(getCustomId(component)).toBe('button-join')
+          expect(options.components).toHaveLength(2)
+          expect(getCustomId(options.components![0])).toBe('button-join')
+          expect(getCustomId(options.components![1])).toBe('button-leave')
 
           expect(options).toMatchSnapshot()
         }
@@ -133,8 +112,8 @@ describe('room scenario', () => {
 
     // leave
     await onInteractionCreated(
-      createChatInputInteraction(
-        'sr-leave',
+      createButtonInteraction(
+        'button-leave',
         {
           channelId,
           guildId,
@@ -163,9 +142,9 @@ describe('room scenario', () => {
             },
           },
           (options) => {
-            expect(options.components).toHaveLength(1)
-            const component = options.components![0]
-            expect(getCustomId(component)).toBe('button-join')
+            expect(options.components).toHaveLength(2)
+            expect(getCustomId(options.components![0])).toBe('button-join')
+            expect(getCustomId(options.components![1])).toBe('button-leave')
           }
         )
       )
@@ -183,9 +162,10 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(2)
+          expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
+          expect(getCustomId(options.components![2])).toBe('button-leave')
           expect(options).toMatchSnapshot()
         }
       )
@@ -194,8 +174,8 @@ describe('room scenario', () => {
     // leave
     // 7人になる
     await onInteractionCreated(
-      createChatInputInteraction(
-        'sr-leave',
+      createButtonInteraction(
+        'button-leave',
         {
           channelId,
           guildId,
@@ -225,9 +205,10 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(2)
+          expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
+          expect(getCustomId(options.components![2])).toBe('button-leave')
         }
       )
     )
@@ -245,9 +226,10 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(2)
+          expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
+          expect(getCustomId(options.components![2])).toBe('button-leave')
         }
       )
     )
@@ -264,8 +246,9 @@ describe('room scenario', () => {
           },
         },
         (options) => {
-          expect(options.components).toHaveLength(1)
+          expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-match')
+          expect(getCustomId(options.components![1])).toBe('button-leave')
           expect(options).toMatchSnapshot()
         }
       )

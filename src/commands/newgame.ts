@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import { CommandHandler } from '../../bot'
-import { createJoinButton } from './helpers/buttons'
+import { createJoinButton, createLeaveButton } from './helpers/buttons'
 
 import { createRoom } from '../operations/createRoom'
 import { SplatRuleSet, getRuleName } from '../rules'
@@ -30,7 +30,7 @@ const handler: CommandHandler = {
 
     await interaction.reply({
       content: `ゲーム募集 ${ruleName} ホスト: ${username} (${inspectRating(result.rating.mu)}) @7~9`,
-      components: [createJoinButton()],
+      components: [createJoinButton(), createLeaveButton()],
     })
   },
 }
