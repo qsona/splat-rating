@@ -15,6 +15,18 @@ exports[`room scenario room scenario 1`] = `
       ],
       "type": 1,
     },
+    {
+      "components": [
+        {
+          "custom_id": "button-leave",
+          "emoji": undefined,
+          "label": "抜ける",
+          "style": 2,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
   ],
   "content": "ゲーム募集 ガチエリア ホスト: username1 (R2000) @7~9",
 }
@@ -30,6 +42,18 @@ exports[`room scenario room scenario 2`] = `
           "emoji": undefined,
           "label": "参加",
           "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+    {
+      "components": [
+        {
+          "custom_id": "button-leave",
+          "emoji": undefined,
+          "label": "抜ける",
+          "style": 2,
           "type": 2,
         },
       ],
@@ -75,6 +99,18 @@ exports[`room scenario room scenario 4`] = `
       ],
       "type": 1,
     },
+    {
+      "components": [
+        {
+          "custom_id": "button-leave",
+          "emoji": undefined,
+          "label": "抜ける",
+          "style": 2,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
   ],
   "content": "username8 さんがゲームに参加しました。 (R2700)
 @0~2",
@@ -98,6 +134,18 @@ exports[`room scenario room scenario 6`] = `
           "emoji": undefined,
           "label": "チーム分け",
           "style": 1,
+          "type": 2,
+        },
+      ],
+      "type": 1,
+    },
+    {
+      "components": [
+        {
+          "custom_id": "button-leave",
+          "emoji": undefined,
+          "label": "抜ける",
+          "style": 2,
           "type": 2,
         },
       ],

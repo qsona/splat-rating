@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js'
 import { joinButtonHandler } from './join'
+import { leaveButtonHandler } from './leave'
 import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
 import { matchButtonHandler } from './match'
 
@@ -68,9 +69,16 @@ const jumpHandler: ButtonCommandHandler = {
   },
 }
 
-;[joinButtonHandler, reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler, matchButtonHandler, dashHandler, jumpHandler].forEach(
-  (handler) => handlers.set(handler.customId, handler)
-)
+;[
+  joinButtonHandler,
+  leaveButtonHandler,
+  reportWinButtonHandler,
+  reportLoseButtonHandler,
+  reportCancelButtonHandler,
+  matchButtonHandler,
+  dashHandler,
+  jumpHandler,
+].forEach((handler) => handlers.set(handler.customId, handler))
 ;[
   tksRoomJoinButtonHandler,
   tksLeaveRoomButtonHandler,

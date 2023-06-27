@@ -3,7 +3,7 @@ import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectRating } from '../inspectors'
-import { createMatchButton, createJoinButton } from './helpers/buttons'
+import { createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
 import { createRegisterAndJoinModal } from './helpers/modals'
 import { ButtonCommandHandler } from './buttonHandlers'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
@@ -41,6 +41,7 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
   const components = []
   if (remainMinUsersCount === 0) components.push(createMatchButton())
   if (remainMaxUsersCount !== 0) components.push(createJoinButton())
+  components.push(createLeaveButton())
 
   await interaction.reply({ content: message, components })
 }

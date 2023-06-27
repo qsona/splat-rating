@@ -80,8 +80,6 @@ export const onInteractionCreated = async (interaction: Interaction) => {
   // if (interaction.type !== InteractionType.ApplicationCommand) {
   if (interaction.isChatInputCommand()) {
     const { commandName } = interaction
-    console.log(commandName)
-    console.log(interaction.user)
 
     const handler = handlers.get(commandName)
     if (handler) {
