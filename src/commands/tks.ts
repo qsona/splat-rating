@@ -130,6 +130,7 @@ export const createTksReportModal = (matchId: string) => {
 export const tksRecruitHandler: CommandHandler = {
   commandName: 'tks-recruit',
   execute: async (interaction) => {
+    const { guildId } = interaction
     const { id, username } = interaction.user
 
     const isAlreadyRecruiting = !!(await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } }))
@@ -137,6 +138,16 @@ export const tksRecruitHandler: CommandHandler = {
       await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
       return
     }
+
+    const rule: SplatRuleSet = 'SplatZones'
+    const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
+    if (!rating) {
+      await interaction.reply({
+        content: `${username} のレーティングが未登録です。下のボタンを押して登録してください。`,
+        components: [createSplatZonesRegisterButton()],
+      })
+    }
+
     await interaction.showModal(createTksRecruitModal())
   },
 }
