@@ -1,59 +1,25 @@
 import { it } from '@jest/globals'
-import { User } from '@prisma/client'
-import assert from 'assert'
 import { onInteractionCreated } from '../../bot'
-import { ButtonBuilder, InteractionReplyOptions } from 'discord.js'
+import { getCustomId, createButtonInteraction, createChatInputInteraction } from './helper'
 import { prisma } from '../../src/prismaClient'
 import { registerUserAndRating } from '../../src/operations/registerUserAndRating'
 
 const guildId = 'guild1'
 const channelId = 'channel1'
 
-const getCustomId = (component: any) => component?.toJSON().components?.[0]?.custom_id
-
-const createChatInputInteraction = (command: string, args: any, onReply: (options: InteractionReplyOptions) => void) => {
-  return {
-    isChatInputCommand: () => true,
-    isButton: () => false,
-    commandName: command,
-    reply: (arg: any) => onReply(typeof arg === 'string' ? { content: arg } : arg),
-    ...args,
-  }
-}
-
-const createButtonInteraction = (command: string, args: any, onReply: (options: InteractionReplyOptions) => void) => {
-  return {
-    isChatInputCommand: () => false,
-    isButton: () => true,
-    customId: command,
-    reply: (arg: any) => onReply(typeof arg === 'string' ? { content: arg } : arg),
-    ...args,
-  }
-}
-
-const createButtonWithDataInteraction = (command: string, data: string, args: any, onReply: (options: InteractionReplyOptions) => void) => {
-  return {
-    isChatInputCommand: () => false,
-    isButton: () => true,
-    customId: `command@data`,
-    reply: (arg: any) => onReply(typeof arg === 'string' ? { content: arg } : arg),
-    ...args,
-  }
-}
-
 describe('room scenario', () => {
   it('room scenario', async () => {
     // prepare
-    const user1 = await registerUserAndRating('user1', 'username1', guildId, 'SplatZones', 2000)
-    const user2 = await registerUserAndRating('user2', 'username2', guildId, 'SplatZones', 2100)
-    const user3 = await registerUserAndRating('user3', 'username3', guildId, 'SplatZones', 2200)
-    const user4 = await registerUserAndRating('user4', 'username4', guildId, 'SplatZones', 2300)
-    const user5 = await registerUserAndRating('user5', 'username5', guildId, 'SplatZones', 2400)
-    const user6 = await registerUserAndRating('user6', 'username6', guildId, 'SplatZones', 2500)
-    const user7 = await registerUserAndRating('user7', 'username7', guildId, 'SplatZones', 2600)
-    const user8 = await registerUserAndRating('user8', 'username8', guildId, 'SplatZones', 2700)
-    const user9 = await registerUserAndRating('user9', 'username9', guildId, 'SplatZones', 2800)
-    const user10 = await registerUserAndRating('user10', 'username10', guildId, 'SplatZones', 2900)
+    await registerUserAndRating('user1', 'username1', guildId, 'SplatZones', 2000)
+    await registerUserAndRating('user2', 'username2', guildId, 'SplatZones', 2100)
+    await registerUserAndRating('user3', 'username3', guildId, 'SplatZones', 2200)
+    await registerUserAndRating('user4', 'username4', guildId, 'SplatZones', 2300)
+    await registerUserAndRating('user5', 'username5', guildId, 'SplatZones', 2400)
+    await registerUserAndRating('user6', 'username6', guildId, 'SplatZones', 2500)
+    await registerUserAndRating('user7', 'username7', guildId, 'SplatZones', 2600)
+    await registerUserAndRating('user8', 'username8', guildId, 'SplatZones', 2700)
+    await registerUserAndRating('user9', 'username9', guildId, 'SplatZones', 2800)
+    await registerUserAndRating('user10', 'username10', guildId, 'SplatZones', 2900)
 
     // new game
     await onInteractionCreated(
