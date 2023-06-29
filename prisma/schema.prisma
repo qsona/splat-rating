@@ -212,6 +212,22 @@ model TksTeam {
   TksMatch2       TksMatch[]       @relation("opponentTeam1")
   TksMatchResult1 TksMatchResult[] @relation("primaryTeam")
   TksMatchResult2 TksMatchResult[] @relation("opponentTeam")
+  TksRating       TksRating[]
+}
+
+model TksRating {
+  id        String   @id @default(cuid())
+  mu        Float
+  sigma     Float
+  teamId    String
+  team      TksTeam  @relation(fields: [teamId], references: [id])
+  rule      String
+  playCount Int      @default(0)
+  winCount  Int      @default(0)
+  loseCount Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, rule])
 }
 
 model TksTeamUser {

@@ -3,15 +3,13 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBu
 import { CommandHandler } from '../../bot'
 import { prisma } from '../prismaClient'
 import { ButtonCommandWithDataHandler } from './buttonHandlers'
-import hash from 'object-hash'
 import { ModalCommandHandler, ModalCommandWithDataHandler } from './modalHandlers'
 import { getUserFromMentionable } from './helpers/mentionable'
 import { uniq } from 'lodash'
 import { SplatRuleSet, getRuleName } from '../rules'
-
-export const calcTeamId = (userIds: string[]) => {
-  return hash(userIds, { unorderedArrays: true })
-}
+import { calcTeamId } from '../models/calcTeamId'
+import { tksCreateParty } from '../operations/tksCreateParty'
+import assertNever from 'assert-never'
 
 const recruitingChannelId = '1043582923644874784'
 const findingOpponentChannelId = '1043583020457807982'
@@ -341,27 +339,23 @@ export const tksPartyHandler: CommandHandler = {
       await interaction.reply('同一のユーザーが含まれています。')
       return
     }
-    for (const { id, username } of users) {
-      await prisma.user.upsert({ where: { id }, update: {}, create: { id, name: username } })
+
+    const result = await tksCreateParty(userIds)
+    if (result.error) {
+      if (result.error === 'RATING_NOT_REGISTERED') {
+        const { ratingUnregisteredUserIds } = result
+        const usernames = ratingUnregisteredUserIds.map((userId) => users.find((u) => (u.id = userId))?.username)
+        await interaction.reply({
+          content: `${usernames.join(' ')} がレート登録していません。`,
+          components: [], // TODO: add register button
+        })
+        return
+      }
+      assertNever(result)
     }
+
+    const { team, party } = result
     const usernames = users.map((user) => user.username)
-    const teamId = calcTeamId(userIds)
-    const { team, party } = await prisma.$transaction(async (prisma) => {
-      const team = await prisma.tksTeam.upsert({
-        where: { id: teamId },
-        update: {},
-        create: {
-          id: teamId,
-          tksTeamUsers: {
-            create: userIds.map((userId) => ({
-              userId,
-            })),
-          },
-        },
-      })
-      const party = await prisma.tksParty.create({ data: { teamId } })
-      return { team, party }
-    })
 
     const nextMessages = [`${usernames.join(' ')} がパーティーを結成したぞ!`]
     if (team.name) {
@@ -371,8 +365,8 @@ export const tksPartyHandler: CommandHandler = {
     const components = [
       createTksFindOpponentButton(party.id),
       // createTksMatchButton(teamId),
-      createTksSetTeamNameButton(teamId),
-      createTksBreakPartyButton(teamId),
+      createTksSetTeamNameButton(team.id),
+      createTksBreakPartyButton(team.id),
     ]
     if (channelId === findingOpponentChannelId) {
       await interaction.reply({ content: nextMessages.join('\n'), components })
