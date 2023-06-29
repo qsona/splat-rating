@@ -1,7 +1,11 @@
 import { CommandHandler } from '../../bot'
+import { prisma } from '../prismaClient'
 
 import { SplatRuleSet, getRuleName } from '../rules'
 import { registerUserAndRating } from '../operations/registerUserAndRating'
+import { ButtonCommandHandler } from './buttonHandlers'
+import { createRegisterModal } from './helpers/modals'
+import { ModalCommandHandler, ModalCommandWithDataHandler } from './modalHandlers'
 
 const handler: CommandHandler = {
   commandName: 'sr-register',
@@ -38,3 +42,30 @@ const handler: CommandHandler = {
 }
 
 export default handler
+
+export const splatZonesRegisterButtonHandler: ButtonCommandHandler = {
+  customId: 'button-splat-zones-register',
+  execute: async (interaction) => {
+    const { guildId, user } = interaction
+    if (!guildId) {
+      console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
+      await interaction.reply('guildId が存在しません。管理者にご連絡ください。')
+      return
+    }
+    const rule: SplatRuleSet = 'SplatZones'
+    const rating = await prisma.rating.findUnique({
+      where: {
+        userId_guildId_rule: {
+          userId: user.id,
+          guildId,
+          rule,
+        },
+      },
+    })
+    if (rating) {
+      await interaction.reply(`${user.username} さんのガチエリアのレーティングはすでに登録されています。`)
+      return
+    }
+    await interaction.showModal(createRegisterModal(rule))
+  },
+}

@@ -55,7 +55,7 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
     execute: async (interaction) => {
       const { guildId, guild, channelId } = interaction
       if (!channelId) {
-        console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
+        console.log(`channelId not found. interaction: ${interaction.toJSON()}`)
         await interaction.reply('channelId が存在しません。管理者にご連絡ください。')
         return
       }
@@ -121,7 +121,47 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
   }
 }
 
-const registerAndJoinModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterAndJoinModalHandler(code))
+const createRegisterModalHandler = (rule: SplatRuleSet): ModalCommandHandler => {
+  return {
+    customId: `modal-register-${rule}`,
+    execute: async (interaction) => {
+      const { guildId, guild } = interaction
+      if (!guildId) {
+        console.log(`guildId not found. interaction: ${interaction.toJSON()}`)
+        await interaction.reply('guildId が存在しません。管理者にご連絡ください。')
+        return
+      }
+      const gachipowerStr = interaction.fields.getTextInputValue('gachipowerInput')
+      const gachipower = Math.trunc(Number(gachipowerStr)) || 0
+      if (gachipower < 600 || 3200 < gachipower) {
+        await interaction.reply('gachipower には 600 から 3200 までの値を入力してください')
+        return
+      }
+      const rulename = getRuleName(rule)
 
-;[...registerAndJoinModalHandlers, dashHandler, tksRecruitModalHandler].forEach((handler) => handlers.set(handler.customId, handler))
+      const { id, username } = interaction.user
+      const name = username
+
+      // register rating
+      const result = await registerUserAndRating(id, username, guildId, rule, gachipower)
+      if (result === 'RATING_ALREADY_REGISTERED') {
+        await interaction.reply(`${guild?.name} において ユーザー ${name} の ${rulename} のレーティングはすでに登録されています。`)
+        return
+      }
+
+      const messages = []
+      if (result.isNewUser) {
+        messages.push(`ユーザー ${name} が新しく登録されました。(ID: ${id})`)
+      }
+
+      messages.push(`ユーザー ${name} の ${rulename} のレーティングが登録されました。 初期値: ${gachipower}`)
+
+      await interaction.reply({ content: messages.join('\n') })
+    },
+  }
+}
+
+const registerAndJoinModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterAndJoinModalHandler(code))
+const registerModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterModalHandler(code))
+;[...registerAndJoinModalHandlers, ...registerModalHandlers, dashHandler, tksRecruitModalHandler].forEach((handler) => handlers.set(handler.customId, handler))
 ;[tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler].forEach((handler) => withDataHandlers.set(handler.customId, handler))

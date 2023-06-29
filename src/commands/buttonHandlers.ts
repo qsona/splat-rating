@@ -3,6 +3,7 @@ import { joinButtonHandler } from './join'
 import { leaveButtonHandler } from './leave'
 import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
 import { matchButtonHandler } from './match'
+import { splatZonesRegisterButtonHandler } from './register'
 
 import {
   tksRoomJoinButtonHandler,
@@ -76,6 +77,7 @@ const jumpHandler: ButtonCommandHandler = {
   reportLoseButtonHandler,
   reportCancelButtonHandler,
   matchButtonHandler,
+  splatZonesRegisterButtonHandler,
   dashHandler,
   jumpHandler,
 ].forEach((handler) => handlers.set(handler.customId, handler))

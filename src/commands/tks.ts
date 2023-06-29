@@ -10,6 +10,7 @@ import { SplatRuleSet, getRuleName } from '../rules'
 import { calcTeamId, teamDisplayName } from '../models/TksTeam'
 import { tksCreateParty } from '../operations/tksCreateParty'
 import assertNever from 'assert-never'
+import { createSplatZonesRegisterButton } from './helpers/buttons'
 
 const recruitingChannelId = '1043582923644874784'
 const findingOpponentChannelId = '1043583020457807982'
@@ -176,6 +177,7 @@ export const tksRecruitModalHandler: ModalCommandHandler = {
 export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
   customId: 'button-tks-room-join',
   execute: async (interaction, tksRecruitingRoomId) => {
+    const { guildId } = interaction
     const { id, username } = interaction.user
     const room = await prisma.tksRecruitingRoom.findUnique({
       where: { id: tksRecruitingRoomId },
@@ -188,6 +190,15 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
     if (room.recruitingRoomUsers.some((ru) => ru.userId === id)) {
       await interaction.reply('すでに参加しています。')
       return
+    }
+
+    const rule: SplatRuleSet = 'SplatZones'
+    const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
+    if (!rating) {
+      await interaction.reply({
+        content: `${username} のレーティングが未登録です。下のボタンを押して登録してください。`,
+        components: [createSplatZonesRegisterButton()],
+      })
     }
 
     const users = room.recruitingRoomUsers.map((ru) => ru.user)
@@ -211,25 +222,21 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
     const usernames = [...users.map((user) => user.name), username]
     const teamId = calcTeamId(userIds)
 
-    const { team, party } = await prisma.$transaction(async (prisma) => {
-      const team = await prisma.tksTeam.upsert({
-        where: { id: teamId },
-        update: {},
-        create: {
-          id: teamId,
-          tksTeamUsers: {
-            create: userIds.map((userId) => ({
-              userId,
-            })),
-          },
-        },
-      })
-      const party = await prisma.tksParty.create({ data: { teamId } })
-
-      await prisma.tksRecruitingRoom.delete({ where: { id: room.id } })
-      return { team, party }
-    })
-    const teamNameMessage = team.name ? `チーム名: ${team.name}` : `メンバー: ${usernames.join(' ')}`
+    const result = await tksCreateParty(userIds, guildId!)
+    if (result.error) {
+      if (result.error === 'RATING_NOT_REGISTERED') {
+        // 本当はこないはずだが一応
+        const { ratingUnregisteredUserIds } = result
+        const unregisteredUsernames = ratingUnregisteredUserIds.map((userId) => users.find((u) => (u.id = userId))?.name)
+        await interaction.reply({
+          content: `${unregisteredUsernames.join(' ')} のレーティングが未登録です。下のボタンを押して登録してください。`,
+          components: [createSplatZonesRegisterButton()],
+        })
+        return
+      }
+    }
+    const { team, teamRating, party } = result
+    const teamNameMessage = teamDisplayName(team, teamRating) // team.name ? `チーム名: ${team.name}` : `メンバー: ${usernames.join(' ')}`
     const message = [
       `${username} が参加しました。`,
       `対抗戦味方募集@うまり`,
@@ -241,9 +248,7 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
 
     const channel = interaction.guild?.channels.cache.get(findingOpponentChannelId)
     const nextMessages = [`${usernames.join(' ')} がパーティーを結成したぞ!`]
-    if (team.name) {
-      nextMessages.push(`チーム名: ${team.name}`)
-    }
+    nextMessages.push(teamNameMessage)
     const components = [
       createTksFindOpponentButton(party.id),
       // createTksMatchButton(teamId),
@@ -347,8 +352,8 @@ export const tksPartyHandler: CommandHandler = {
         const { ratingUnregisteredUserIds } = result
         const usernames = ratingUnregisteredUserIds.map((userId) => users.find((u) => (u.id = userId))?.username)
         await interaction.reply({
-          content: `${usernames.join(' ')} がレート登録していません。`,
-          components: [], // TODO: add register button
+          content: `${usernames.join(' ')} のレーティングが未登録です。下のボタンを押して登録してください。`,
+          components: [createSplatZonesRegisterButton()],
         })
         return
       }

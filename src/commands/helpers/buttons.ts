@@ -29,3 +29,9 @@ export const createCancelButton = () => {
     new ButtonBuilder().setCustomId('button-report-cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary)
   )
 }
+
+export const createSplatZonesRegisterButton = () => {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder().setCustomId('button-splat-zones-register').setLabel('レーティング登録').setStyle(ButtonStyle.Secondary)
+  )
+}
