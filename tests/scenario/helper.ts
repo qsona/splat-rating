@@ -6,6 +6,10 @@ export const getCustomIdWithoutData = (component: any) => {
   return customId.match(/^(.+)@/)[1]
 }
 export const getModalCustomId = (modal: any) => modal.data.custom_id
+export const getModalCustomIdWithoutData = (modal: any) => {
+  const customId = modal.data.custom_id
+  return customId.match(/^(.+)@/)[1]
+}
 
 export type CallbacksType =
   | ((options: InteractionReplyOptions) => Promise<void>)

@@ -9,6 +9,7 @@ import {
   getModalCustomId,
   createModalWithDataInteraction,
   createModalInteraction,
+  getModalCustomIdWithoutData,
 } from './helper'
 import { prisma } from '../../src/prismaClient'
 import { registerUserAndRating } from '../../src/operations/registerUserAndRating'
@@ -208,10 +209,109 @@ describe('tks scenario', () => {
         },
         {
           onShowModal: async (options) => {
-            console.log(options)
+            expect(getModalCustomIdWithoutData(options)).toBe('modal-tks-find-opponent')
           },
         }
       )
     )
+    await onInteractionCreated(
+      createModalWithDataInteraction(
+        'modal-tks-find-opponent',
+        firstParty!.id,
+        {
+          channelId,
+          guildId,
+          user: {
+            id: 'user1',
+            username: 'username1',
+          },
+          fields: { getTextInputValue: () => '3' }, // TODO: use mock
+        },
+        {
+          onReply: async (options) => {
+            expect(options.content).toMatchSnapshot()
+            expect(options.components).toHaveLength(1)
+            expect(getCustomId(options.components![0])).toBe(`button-tks-match@${firstParty!.id}`)
+          },
+        }
+      )
+    )
+    const findingOpponent = await prisma.tksFindingOpponent.findFirst()
+    expect(findingOpponent).toBeTruthy()
+    expect(findingOpponent!.winCountOfMatch).toBe(3)
+
+    await onInteractionCreated(
+      createButtonWithDataInteraction(
+        'button-tks-match',
+        firstParty!.id,
+        {
+          channelId,
+          guildId,
+          user: {
+            id: 'user5',
+            username: 'username5',
+          },
+        },
+        {
+          onReply: async (options) => {
+            expect(options.content).toMatchSnapshot()
+            expect(options.components).toHaveLength(1)
+            expect(getCustomIdWithoutData(options.components![0])).toBe(`button-tks-report`)
+          },
+        }
+      )
+    )
+    expect(await prisma.tksFindingOpponent.findFirst()).toBeNull()
+    const match = await prisma.tksMatch.findFirst()
+    expect(match).toBeTruthy()
+    expect(match!.primaryTeamId).toBe(firstParty!.teamId)
+
+    // report
+    await onInteractionCreated(
+      createButtonWithDataInteraction(
+        'button-tks-report',
+        match!.id,
+        {
+          channelId,
+          guildId,
+          user: {
+            id: 'user2',
+            username: 'username2',
+          },
+        },
+        {
+          onShowModal: async (options) => {
+            expect(getModalCustomId(options)).toBe(`modal-tks-report@${match!.id}`)
+          },
+        }
+      )
+    )
+    await onInteractionCreated(
+      createModalWithDataInteraction(
+        'modal-tks-report',
+        match!.id,
+        {
+          channelId,
+          guildId,
+          user: {
+            id: 'user2',
+            username: 'username2',
+          },
+          fields: { getTextInputValue: (arg: string) => (arg === 'primaryWinCount' ? '3' : '2') }, // TODO: use mock
+        },
+        {
+          onReply: async (options) => {
+            expect(options.content).toMatchSnapshot()
+            expect(options.components || []).toHaveLength(0)
+          },
+        }
+      )
+    )
+    expect(await prisma.tksMatch.findFirst()).toBeNull()
+    const matchResult = await prisma.tksMatchResult.findFirst()
+    expect(matchResult).toBeTruthy()
+    expect(matchResult!.primaryTeamId).toBe(firstParty!.teamId)
+    expect(matchResult!.primaryWinCount).toBe(3)
+    expect(matchResult!.opponentWinCount).toBe(2)
   })
 })
