@@ -36,7 +36,7 @@ describe('room scenario', () => {
             getString: () => 'SplatZones', // TODO: use mock
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(1)
           expect(getCustomId(options.components![0])).toBe('button-join')
 
@@ -65,7 +65,7 @@ describe('room scenario', () => {
             username: 'username2',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-join')
           expect(getCustomId(options.components![1])).toBe('button-leave')
@@ -87,7 +87,7 @@ describe('room scenario', () => {
             username: 'username2',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options).toMatchSnapshot()
         }
       )
@@ -106,7 +106,7 @@ describe('room scenario', () => {
               username: `username${i}`,
             },
           },
-          (options) => {
+          async (options) => {
             expect(options.components).toHaveLength(2)
             expect(getCustomId(options.components![0])).toBe('button-join')
             expect(getCustomId(options.components![1])).toBe('button-leave')
@@ -126,7 +126,7 @@ describe('room scenario', () => {
             username: 'username8',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
@@ -149,7 +149,7 @@ describe('room scenario', () => {
             username: 'username2',
           },
         },
-        (options) => {
+        async (options) => {
           // no button-match
           expect(options.components || []).toHaveLength(0)
           expect(options).toMatchSnapshot()
@@ -169,7 +169,7 @@ describe('room scenario', () => {
             username: 'username2',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
@@ -190,7 +190,7 @@ describe('room scenario', () => {
             username: 'username9',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(3)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-join')
@@ -210,7 +210,7 @@ describe('room scenario', () => {
             username: 'username10',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-match')
           expect(getCustomId(options.components![1])).toBe('button-leave')
@@ -231,7 +231,7 @@ describe('room scenario', () => {
             username: 'username1',
           },
         },
-        (options) => {
+        async (options) => {
           expect(options).toMatchSnapshot()
         }
       )

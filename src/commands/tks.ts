@@ -132,7 +132,7 @@ export const tksRecruitHandler: CommandHandler = {
   execute: async (interaction) => {
     const { id, username } = interaction.user
 
-    const isAlreadyRecruiting = await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } })
+    const isAlreadyRecruiting = !!(await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } }))
     if (isAlreadyRecruiting) {
       await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
       return

@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tks scenario tks scenario 1`] = `
+{
+  "content": "username1 username2 username3 username4 がパーティーを結成したぞ!
+メンバーは<#1043583020457807982> に移動してください 🚀",
+}
+`;
+
+exports[`tks scenario tks scenario 2`] = `
+"@everyone
+username5: 対抗戦味方募集@3
+description 1"
+`;
+
+exports[`tks scenario tks scenario 3`] = `
+{
+  "content": "username8 が参加しました。
+対抗戦味方募集@うまり
+メンバー: username5 username6 username7 username8
+メンバーは<#1043583020457807982> に移動してください 🚀",
+}
+`;
+
+exports[`tks scenario tks scenario 4`] = `"username5 username6 username7 username8 がパーティーを結成したぞ!"`;
