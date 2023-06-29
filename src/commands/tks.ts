@@ -7,7 +7,7 @@ import { ModalCommandHandler, ModalCommandWithDataHandler } from './modalHandler
 import { getUserFromMentionable } from './helpers/mentionable'
 import { uniq } from 'lodash'
 import { SplatRuleSet, getRuleName } from '../rules'
-import { calcTeamId } from '../models/calcTeamId'
+import { calcTeamId, teamDisplayName } from '../models/TksTeam'
 import { tksCreateParty } from '../operations/tksCreateParty'
 import assertNever from 'assert-never'
 
@@ -354,13 +354,11 @@ export const tksPartyHandler: CommandHandler = {
       assertNever(result)
     }
 
-    const { team, party } = result
+    const { team, party, teamRating } = result
     const usernames = users.map((user) => user.username)
 
     const nextMessages = [`${usernames.join(' ')} がパーティーを結成したぞ!`]
-    if (team.name) {
-      nextMessages.push(`チーム名: ${team.name}`)
-    }
+    nextMessages.push(teamDisplayName(team, teamRating))
 
     const components = [
       createTksFindOpponentButton(party.id),

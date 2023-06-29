@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { prisma } from '../prismaClient'
-import { calcTeamId } from '../models/calcTeamId'
+import { calcTeamId } from '../models/TksTeam'
 import { SplatRuleSet } from '../rules'
 import { Rating } from '@prisma/client'
 

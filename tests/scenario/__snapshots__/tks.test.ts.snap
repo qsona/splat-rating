@@ -3,6 +3,7 @@
 exports[`tks scenario tks scenario 1`] = `
 {
   "content": "username1 username2 username3 username4 がパーティーを結成したぞ!
+:black_heart: (チーム名未設定)
 メンバーは<#1043583020457807982> に移動してください 🚀",
 }
 `;
