@@ -7,7 +7,7 @@ import { Rating } from '@prisma/client'
 const rule: SplatRuleSet = 'SplatZones'
 const INITIAL_SIGMA = 100
 
-export const tksCreateParty = async (userIds: string[]) => {
+export const tksCreateParty = async (userIds: string[], guildId: string) => {
   assert(userIds.length === 4, 'userIds.length must be 4')
 
   const teamId = calcTeamId(userIds)
@@ -16,7 +16,7 @@ export const tksCreateParty = async (userIds: string[]) => {
   let teamRating = team ? await prisma.tksRating.findUnique({ where: { teamId_rule: { teamId, rule } } }) : null
   let userRatings: Rating[]
   if (!teamRating) {
-    userRatings = await prisma.rating.findMany({ where: { userId: { in: userIds } } })
+    userRatings = await prisma.rating.findMany({ where: { rule, guildId, userId: { in: userIds } } })
     if (userRatings.length !== 4) {
       const ratingUnregisteredUserIds = userIds.filter((userId) => !userRatings.find((userRating) => userRating.userId === userId))
       return {

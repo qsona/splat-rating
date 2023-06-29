@@ -325,7 +325,7 @@ export const tksBreakRoomButtonHandler: ButtonCommandWithDataHandler = {
 export const tksPartyHandler: CommandHandler = {
   commandName: 'tks-party',
   execute: async (interaction) => {
-    const { user, channelId } = interaction
+    const { user, channelId, guildId } = interaction
     const mentionable2 = interaction.options.getMentionable('user2')!
     const user2 = getUserFromMentionable(mentionable2)!
     const mentionable3 = interaction.options.getMentionable('user3')!
@@ -340,7 +340,7 @@ export const tksPartyHandler: CommandHandler = {
       return
     }
 
-    const result = await tksCreateParty(userIds)
+    const result = await tksCreateParty(userIds, guildId!)
     if (result.error) {
       if (result.error === 'RATING_NOT_REGISTERED') {
         const { ratingUnregisteredUserIds } = result
