@@ -80,15 +80,16 @@ export const createTksSetTeamNameModal = (teamId: string, isUpdating: boolean) =
 
 export const createTksFindOpponentModal = (partyId: string) => {
   const modal = new ModalBuilder().setCustomId(`modal-tks-find-opponent@${partyId}`).setTitle('対抗戦相手募集')
-  const winCountOfMatchInput = new TextInputBuilder().setCustomId('winCountOfMatch').setLabel('N本先取(整数)').setRequired(true).setStyle(TextInputStyle.Short)
+  // const winCountOfMatchInput = new TextInputBuilder().setCustomId('winCountOfMatch').setLabel('N本先取(整数)').setRequired(true).setStyle(TextInputStyle.Short)
   const descriptionInput = new TextInputBuilder()
     .setCustomId('description')
     .setLabel('募集の説明 (パーティーのウデマエ/パワー目安、対戦相手への希望、開始時間など)')
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph)
-  const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(winCountOfMatchInput)
-  const secondActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput)
-  modal.addComponents(firstActionRow, secondActionRow)
+  // 一旦3先で固定する
+  // const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(winCountOfMatchInput)
+  const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput)
+  modal.addComponents(firstActionRow)
   return modal
 }
 
@@ -428,11 +429,13 @@ export const tksFindOpponentModalHandler: ModalCommandWithDataHandler = {
       await interaction.reply('すでに対戦相手を募集中です。')
       return
     }
-    const winCountOfMatchStr = interaction.fields.getTextInputValue('winCountOfMatch')
-    const winCountOfMatch = Math.trunc(Number(winCountOfMatchStr))
-    if (Number.isNaN(winCountOfMatch) || winCountOfMatch <= 0 || 10 < winCountOfMatch) {
-      await interaction.reply('N本先取の値が不正です。')
-    }
+    // 一旦 winCountOfMatch は 3 で固定
+    // const winCountOfMatchStr = interaction.fields.getTextInputValue('winCountOfMatch')
+    // const winCountOfMatch = Math.trunc(Number(winCountOfMatchStr))
+    // if (Number.isNaN(winCountOfMatch) || winCountOfMatch <= 0 || 10 < winCountOfMatch) {
+    //   await interaction.reply('N本先取の値が不正です。')
+    // }
+    const winCountOfMatch = 3
     const description = interaction.fields.getTextInputValue('description') || null
     const rule: SplatRuleSet = 'SplatZones'
     await prisma.tksFindingOpponent.create({
