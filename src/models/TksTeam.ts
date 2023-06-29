@@ -13,42 +13,42 @@ type TksTeamRank = {
 
 const teamRanks: TksTeamRank[] = [
   {
-    minRate: 2600,
+    minRate: 2500,
     color: 'heart',
     iconText: ':heart:',
   },
   {
-    minRate: 2500,
+    minRate: 2400,
     color: 'orange',
     iconText: ':orange_heart:',
   },
   {
-    minRate: 2400,
+    minRate: 2300,
     color: 'yellow',
     iconText: ':yellow_heart:',
   },
   {
-    minRate: 2300,
+    minRate: 2200,
     color: 'green',
     iconText: ':green_heart:',
   },
   {
-    minRate: 2200,
+    minRate: 2100,
     color: 'blue',
     iconText: ':blue_heart:',
   },
   {
-    minRate: 2100,
+    minRate: 2000,
     color: 'purple',
     iconText: ':purple_heart:',
   },
   {
-    minRate: 2000,
+    minRate: 1900,
     color: 'black',
     iconText: ':black_heart:',
   },
   {
-    minRate: 1900,
+    minRate: 1800,
     color: 'white',
     iconText: ':white_heart:',
   },
