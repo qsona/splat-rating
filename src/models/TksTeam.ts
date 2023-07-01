@@ -63,6 +63,20 @@ export const calcRate = (rating: TksRating) => rating.mu - rating.sigma
 export const getRank = (rate: number) => teamRanks.find((r) => rate >= r.minRate)!
 
 export const teamDisplayName = (team: TksTeam, rating: TksRating) => {
-  const rank = getRank(calcRate(rating))
-  return `${rank.iconText} ${team.name || '(チーム名未設定)'}`
+  const { rank, rate, isTentative } = tksTeamRatingInfo(team, rating)
+  const rateText = isTentative ? `[計測中 ${rating.winCount}/5] (推定R${rate})` : `${rank.iconText} (R${rate})`
+  return `${rateText} | ${team.name || '(チーム名未設定)'}`
+}
+
+export const tksTeamRatingInfo = (team: TksTeam, rating: TksRating) => {
+  const rate = calcRate(rating)
+  const rank = getRank(rate)
+  const isTentative = rating.winCount < 5
+  return {
+    rank,
+    rate,
+    isTentative,
+    team,
+    rating,
+  }
 }
