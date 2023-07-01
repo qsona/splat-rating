@@ -377,7 +377,7 @@ export const tksPartyHandler: CommandHandler = {
     if (result.error) {
       if (result.error === 'RATING_NOT_REGISTERED') {
         const { ratingUnregisteredUserIds } = result
-        const usernames = ratingUnregisteredUserIds.map((userId) => users.find((u) => (u.id = userId))?.username)
+        const usernames = ratingUnregisteredUserIds.map((userId) => users.find((u) => u.id === userId)?.username)
         await interaction.reply({
           content: `${usernames.join(' ')} のレーティングが未登録です。下のボタンを押して登録してください。`,
           components: [createSplatZonesRegisterButton()],
