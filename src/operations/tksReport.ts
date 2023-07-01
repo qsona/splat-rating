@@ -1,7 +1,6 @@
+import { rate } from 'openskill'
 import { prisma } from '../prismaClient'
-import { SplatRuleSet } from '../rules'
 
-const rule: SplatRuleSet = 'SplatZones'
 const BETA = 50
 
 export const tksReport = async (userId: string, matchId: string, primaryWinCount: number, opponentWinCount: number, isInterrupted: boolean) => {
@@ -33,7 +32,10 @@ export const tksReport = async (userId: string, matchId: string, primaryWinCount
   }
 
   const { primaryTeamId, opponentTeamId, winCountOfMatch, rule } = match
-  const tksMatchResult = await prisma.$transaction(async (prisma) => {
+  const primaryTeamRating = await prisma.tksRating.findUniqueOrThrow({ where: { teamId_rule: { teamId: primaryTeamId, rule } } })
+  const opponentTeamRating = await prisma.tksRating.findUniqueOrThrow({ where: { teamId_rule: { teamId: opponentTeamId, rule } } })
+
+  const result = await prisma.$transaction(async (prisma) => {
     await prisma.tksMatch.delete({ where: { id: matchId } })
     const tksMatchResult = await prisma.tksMatchResult.create({
       data: {
@@ -46,7 +48,36 @@ export const tksReport = async (userId: string, matchId: string, primaryWinCount
         rule,
       },
     })
-    return tksMatchResult
+    if (isInterrupted) {
+      return { isInterrupted: true as const, tksMatchResult, deletedMatch: match }
+    }
+
+    const isPrimaryWin = primaryWinCount === winCountOfMatch
+    const primary = { mu: primaryTeamRating.mu, sigma: primaryTeamRating.sigma }
+    const opponent = { mu: opponentTeamRating.mu, sigma: opponentTeamRating.sigma }
+    const [winNew, loseNew] = rate(isPrimaryWin ? [[primary], [opponent]] : [[opponent], [primary]], { beta: BETA })
+    const [primaryNew, opponentNew] = isPrimaryWin ? [winNew[0], loseNew[0]] : [loseNew[0], winNew[0]]
+    const primaryNewRating = await prisma.tksRating.update({
+      where: { id: primaryTeamRating.id },
+      data: {
+        mu: primaryNew.mu,
+        sigma: primaryNew.sigma,
+        playCount: { increment: 1 },
+        winCount: { increment: isPrimaryWin ? 1 : 0 },
+        loseCount: { increment: isPrimaryWin ? 0 : 1 },
+      },
+    })
+    const opponentNewRating = await prisma.tksRating.update({
+      where: { id: opponentTeamRating.id },
+      data: {
+        mu: opponentNew.mu,
+        sigma: opponentNew.sigma,
+        playCount: { increment: 1 },
+        winCount: { increment: isPrimaryWin ? 0 : 1 },
+        loseCount: { increment: isPrimaryWin ? 1 : 0 },
+      },
+    })
+    return { isInterrupted: false as const, tksMatchResult, deletedMatch: match, primaryNewRating, opponentNewRating }
   })
-  return { tksMatchResult, deletedMatch: match }
+  return { error: false as const, ...result }
 }

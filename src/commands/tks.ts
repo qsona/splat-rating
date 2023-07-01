@@ -606,15 +606,26 @@ export const tksReportModalHandler: ModalCommandWithDataHandler = {
 
     const { deletedMatch: match } = result
     const { primaryTeam, opponentTeam } = match
-    const messages = [
-      `アルファ: [チーム名: ${primaryTeam.name || '(未定)'}] ${primaryTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
-      `ブラボー: [チーム名: ${opponentTeam.name || '(未定)'}] ${opponentTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
-      '',
-      `結果: アルファ ${primaryWinCount} - ${opponentWinCount} ブラボー 💡`,
-    ]
-    if (isInterrupted) {
-      messages.push('中断')
+    if (result.isInterrupted) {
+      const messages = [
+        `アルファ: [チーム名: ${primaryTeam.name || '(未定)'}] ${primaryTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
+        `ブラボー: [チーム名: ${opponentTeam.name || '(未定)'}] ${opponentTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
+        '',
+        `結果: アルファ ${primaryWinCount} - ${opponentWinCount} ブラボー 💡 (中断)`,
+      ]
+      await interaction.reply({ content: messages.join('\n') })
+      return
     }
-    interaction.reply({ content: messages.join('\n') })
+
+    const { primaryNewRating, opponentNewRating } = result
+
+    const messages = [
+      `結果: アルファ ${primaryWinCount} - ${opponentWinCount} ブラボー 💡`,
+      '',
+      `アルファ: ${inspectTksTeam(primaryTeam, primaryNewRating)}`,
+      `ブラボー: ${inspectTksTeam(opponentTeam, opponentNewRating)}`,
+    ]
+    await interaction.reply({ content: messages.join('\n') })
+    return
   },
 }

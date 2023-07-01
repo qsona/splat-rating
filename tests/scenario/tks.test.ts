@@ -19,6 +19,7 @@ const channelId = 'channel1'
 
 describe('tks scenario', () => {
   it('tks scenario', async () => {
+    const rule = 'SplatZones'
     // prepare
     await registerUserAndRating('user1', 'username1', guildId, 'SplatZones', 2000)
     await registerUserAndRating('user2', 'username2', guildId, 'SplatZones', 2100)
@@ -70,6 +71,9 @@ describe('tks scenario', () => {
     expect(firstParty).toBeTruthy()
     expect(firstParty?.team).toBeTruthy()
     expect(firstParty?.team.tksTeamUsers).toHaveLength(4)
+
+    const firstPartyRatingInitial = await prisma.tksRating.findFirst({ where: { teamId: firstParty!.teamId, rule } })
+    expect(firstPartyRatingInitial).toBeTruthy()
 
     // new recruit
     await onInteractionCreated(
@@ -311,7 +315,14 @@ describe('tks scenario', () => {
     const matchResult = await prisma.tksMatchResult.findFirst()
     expect(matchResult).toBeTruthy()
     expect(matchResult!.primaryTeamId).toBe(firstParty!.teamId)
-    expect(matchResult!.primaryWinCount).toBe(3)
-    expect(matchResult!.opponentWinCount).toBe(2)
+    expect(matchResult!.primaryWinCount).toBe(2)
+    expect(matchResult!.opponentWinCount).toBe(3)
+
+    const firstPartyRating = await prisma.tksRating.findFirst({
+      where: { teamId: firstParty!.teamId, rule: 'SplatZones' },
+    })
+    expect(firstPartyRating).toBeTruthy()
+    expect(firstPartyRating!.mu).toBeGreaterThan(firstPartyRatingInitial!.mu)
+    expect(firstPartyRating!.sigma).toBeLessThan(firstPartyRatingInitial!.sigma)
   })
 })

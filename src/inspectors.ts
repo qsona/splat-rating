@@ -14,6 +14,6 @@ export const inspectTeamUsers = (teamUsers: { mu: number; username: string }[]) 
 
 export const inspectTksTeam = (team: TksTeam, rating: TksRating) => {
   const { rank, rate, isTentative } = tksTeamRatingInfo(team, rating)
-  const rateText = isTentative ? `[計測中...${rating.winCount}/5] (推定${inspectR(rate)})` : `${rank.iconText} (${inspectR(rate)})`
+  const rateText = isTentative ? `[計測中...${rating.playCount}/5] (推定${inspectR(rate)})` : `${rank.iconText} (${inspectR(rate)})`
   return `${rateText} | ${team.name || '(チーム名未設定)'}`
 }
