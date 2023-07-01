@@ -63,7 +63,7 @@ export const splatZonesRegisterButtonHandler: ButtonCommandHandler = {
       },
     })
     if (rating) {
-      await interaction.reply(`${user.username} さんのガチエリアのレーティングはすでに登録されています。`)
+      await interaction.reply({ content: `${user.username} さんのガチエリアのレーティングはすでに登録されています。` })
       return
     }
     await interaction.showModal(createRegisterModal(rule))

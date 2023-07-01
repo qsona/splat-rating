@@ -195,11 +195,11 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
       include: { recruitingRoomUsers: { include: { user: true } } },
     })
     if (!room) {
-      await interaction.reply('その募集はすでに解散しています。')
+      await interaction.reply({ content: 'その募集はすでに解散しています。', ephemeral: true })
       return
     }
     if (room.recruitingRoomUsers.some((ru) => ru.userId === id)) {
-      await interaction.reply('すでに参加しています。')
+      await interaction.reply({ content: 'すでに参加しています。', ephemeral: true })
       return
     }
 
@@ -289,7 +289,7 @@ export const tksSetTeamNameModalHandler: ModalCommandWithDataHandler = {
     const teamName = interaction.fields.getTextInputValue('teamNameInput')
     const team = await prisma.tksTeam.findUnique({ where: { id: tksTeamId } })
     if (!team) {
-      await interaction.reply('チームがありません。')
+      await interaction.reply({ content: 'チームがありません。', ephemeral: true })
       return
     }
     await prisma.tksTeam.update({ where: { id: tksTeamId }, data: { name: teamName } })
@@ -308,12 +308,12 @@ export const tksLeaveRoomButtonHandler: ButtonCommandWithDataHandler = {
       include: { recruitingRoomUsers: true },
     })
     if (!room) {
-      await interaction.reply('その募集はすでに解散しています。')
+      await interaction.reply({ content: 'その募集はすでに解散しています。', ephemeral: true })
       return
     }
     const roomUser = room.recruitingRoomUsers.find((ru) => ru.userId === user.id)
     if (!roomUser) {
-      await interaction.reply(`${user.username} はこの募集に参加していません。`)
+      await interaction.reply({ content: `${user.username} はこの募集に参加していません。`, ephemeral: true })
       return
     }
     await prisma.tksRecruitingRoomUser.delete({ where: { id: roomUser.id } })
@@ -327,11 +327,11 @@ export const tksBreakRoomButtonHandler: ButtonCommandWithDataHandler = {
     const { user } = interaction
     const room = await prisma.tksRecruitingRoom.findUnique({ where: { id: tksRecruitingRoomId } })
     if (!room) {
-      await interaction.reply('その募集はすでに解散しています。')
+      await interaction.reply({ content: 'その募集はすでに解散しています。', ephemeral: true })
       return
     }
     if (room.creatorUserId !== user.id) {
-      await interaction.reply(`${user.username} はこの募集のホストではありません。`)
+      await interaction.reply({ content: `${user.username} はこの募集のホストではありません。`, ephemeral: true })
       return
     }
     await prisma.tksRecruitingRoom.delete({ where: { id: tksRecruitingRoomId } })
@@ -353,7 +353,7 @@ export const tksPartyHandler: CommandHandler = {
     const users = [user, user2, user3, user4]
     const userIds = users.map((user) => user.id)
     if (uniq(userIds).length !== 4) {
-      await interaction.reply('同一のユーザーが含まれています。')
+      await interaction.reply({ content: '同一のユーザーが含まれています。', ephemeral: true })
       return
     }
 
@@ -401,7 +401,7 @@ export const tksBreakPartyButtonHandler: ButtonCommandWithDataHandler = {
   execute: async (interaction, teamId) => {
     const party = await prisma.tksParty.findUnique({ where: { teamId } })
     if (!party) {
-      await interaction.reply('パーティーがありません。')
+      await interaction.reply({ content: 'パーティーがありません。', ephemeral: true })
       return
     }
     await prisma.tksParty.delete({ where: { teamId } })
@@ -415,7 +415,7 @@ export const tksFindOpponentButtonHandler: ButtonCommandWithDataHandler = {
   execute: async (interaction, partyId) => {
     const party = await prisma.tksParty.findUnique({ where: { id: partyId } })
     if (!party) {
-      await interaction.reply('パーティーがありません。')
+      await interaction.reply({ content: 'パーティーがありません。', ephemeral: true })
       return
     }
     const findingOpponent = await prisma.tksFindingOpponent.findUnique({ where: { partyId } })
@@ -437,7 +437,7 @@ export const tksFindOpponentModalHandler: ModalCommandWithDataHandler = {
       include: { team: { include: { tksTeamUsers: { include: { user: true } } } } },
     })
     if (!party) {
-      await interaction.reply('パーティーがありません。')
+      await interaction.reply({ content: 'パーティーがありません。', ephemeral: true })
       return
     }
     const findingOpponent = await prisma.tksFindingOpponent.findUnique({ where: { partyId } })
@@ -480,7 +480,7 @@ export const tksMatchButtonHandler: ButtonCommandWithDataHandler = {
       include: { party: { include: { team: { include: { tksTeamUsers: { include: { user: true } } } } } } },
     })
     if (!findingOpponent) {
-      await interaction.reply('そのパーティーは対戦相手を募集していないか、解散しています')
+      await interaction.reply({ content: 'そのパーティーは対戦相手を募集していないか、解散しています', ephemeral: true })
       return
     }
     const targetParty = findingOpponent.party
