@@ -15,7 +15,7 @@ import { createSplatZonesRegisterButton } from './helpers/buttons'
 import { tksReport } from '../operations/tksReport'
 
 const recruitingChannelId = '1043582923644874784'
-const findingOpponentChannelId = '1043583020457807982'
+const findingOpponentChannelId = '1124749344655036426'
 
 // button and modals
 
