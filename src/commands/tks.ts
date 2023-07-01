@@ -179,7 +179,7 @@ export const tksRecruitModalHandler: ModalCommandHandler = {
       return { tksRecruitingRoom }
     })
     // const messages = ['@everyone', `${username}: 対抗戦味方募集@3`]
-    const messages = ['通知切ってますなう', `${username}: 対抗戦味方募集@3`]
+    const messages = [`${username}: 対抗戦味方募集@3`]
     if (description) messages.push(description)
     await interaction.reply({
       content: messages.join('\n'),
