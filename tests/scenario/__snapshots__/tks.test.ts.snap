@@ -3,13 +3,13 @@
 exports[`tks scenario tks scenario 1`] = `
 {
   "content": "username1 username2 username3 username4 がパーティーを結成したぞ!
-:purple_heart: (チーム名未設定)
+[計測中 0/5] (推定R2000) | (チーム名未設定)
 メンバーは<#1043583020457807982> に移動してください 🚀",
 }
 `;
 
 exports[`tks scenario tks scenario 2`] = `
-"@everyone
+"通知切ってますなう
 username5: 対抗戦味方募集@3
 description 1"
 `;
@@ -18,14 +18,14 @@ exports[`tks scenario tks scenario 3`] = `
 {
   "content": "username8 が参加しました。
 対抗戦味方募集@うまり
-:purple_heart: (チーム名未設定)
+[計測中 0/5] (推定R2000) | (チーム名未設定)
 メンバーは<#1043583020457807982> に移動してください 🚀",
 }
 `;
 
 exports[`tks scenario tks scenario 4`] = `
 "username5 username6 username7 username8 がパーティーを結成したぞ!
-:purple_heart: (チーム名未設定)"
+[計測中 0/5] (推定R2000) | (チーム名未設定)"
 `;
 
 exports[`tks scenario tks scenario 5`] = `
