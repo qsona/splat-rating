@@ -7,7 +7,8 @@ import { ModalCommandHandler, ModalCommandWithDataHandler } from './modalHandler
 import { getUserFromMentionable } from './helpers/mentionable'
 import { uniq } from 'lodash'
 import { SplatRuleSet, getRuleName } from '../rules'
-import { calcTeamId, teamDisplayName } from '../models/TksTeam'
+import { calcTeamId } from '../models/TksTeam'
+import { inspectTksTeam } from '../inspectors'
 import { tksCreateParty } from '../operations/tksCreateParty'
 import assertNever from 'assert-never'
 import { createSplatZonesRegisterButton } from './helpers/buttons'
@@ -248,7 +249,7 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
       }
     }
     const { team, teamRating, party } = result
-    const teamNameMessage = teamDisplayName(team, teamRating) // team.name ? `チーム名: ${team.name}` : `メンバー: ${usernames.join(' ')}`
+    const teamNameMessage = inspectTksTeam(team, teamRating) // team.name ? `チーム名: ${team.name}` : `メンバー: ${usernames.join(' ')}`
     const message = [
       `${username} が参加しました。`,
       `対抗戦味方募集@うまり`,
@@ -379,7 +380,7 @@ export const tksPartyHandler: CommandHandler = {
     const usernames = users.map((user) => user.username)
 
     const nextMessages = [`${usernames.join(' ')} がパーティーを結成したぞ!`]
-    nextMessages.push(teamDisplayName(team, teamRating))
+    nextMessages.push(inspectTksTeam(team, teamRating))
 
     const components = [
       createTksFindOpponentButton(party.id),

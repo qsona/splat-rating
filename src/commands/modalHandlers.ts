@@ -3,7 +3,7 @@ import { ModalSubmitInteraction } from 'discord.js'
 import { registerUserAndRating } from '../operations/registerUserAndRating'
 import { joinRoom } from '../operations/joinRoom'
 import { SplatRuleSet, getRuleName, SPLAT_RULES_NAME_MAP } from '../rules'
-import { inspectRating } from '../inspectors'
+import { inspectR } from '../inspectors'
 import { createJoinButton, createMatchButton } from './helpers/buttons'
 import { tksRecruitModalHandler, tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler } from './tks'
 
@@ -110,7 +110,7 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
 
       const remainMinUsersCount = Math.max(joinResult.remainMinUsersCount, 0)
       const { remainMaxUsersCount } = joinResult
-      messages.push(`${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`)
+      messages.push(`${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`)
 
       const components = []
       if (remainMinUsersCount === 0) components.push(createMatchButton())

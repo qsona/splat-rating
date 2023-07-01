@@ -1,7 +1,7 @@
 import { CommandHandler } from '../../bot'
 
 import { prisma } from '../prismaClient'
-import { inspectRating } from '../inspectors'
+import { inspectR } from '../inspectors'
 import assert from 'assert'
 import { createJoinButton } from './helpers/buttons'
 
@@ -33,7 +33,7 @@ const handler: CommandHandler = {
     const isJoinable = remainMaxUsersCount > 0
     const messages = [
       isJoinable ? `ゲーム募集中@${remainMinUsersCount}~${remainMaxUsersCount}` : 'ゲーム中(満員)',
-      usersInfo.map((u) => `${u.name} (${inspectRating(u.rating.mu)})`).join(' '),
+      usersInfo.map((u) => `${u.name} (${inspectR(u.rating.mu)})`).join(' '),
     ]
     const components = isJoinable ? [createJoinButton()] : []
 

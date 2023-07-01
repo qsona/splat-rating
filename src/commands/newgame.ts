@@ -5,7 +5,7 @@ import { createJoinButton, createLeaveButton } from './helpers/buttons'
 
 import { createRoom } from '../operations/createRoom'
 import { SplatRuleSet, getRuleName } from '../rules'
-import { inspectRating } from '../inspectors'
+import { inspectR } from '../inspectors'
 
 const handler: CommandHandler = {
   commandName: 'sr-newgame',
@@ -29,7 +29,7 @@ const handler: CommandHandler = {
     }
 
     await interaction.reply({
-      content: `ゲーム募集 ${ruleName} ホスト: ${username} (${inspectRating(result.rating.mu)}) @7~9`,
+      content: `ゲーム募集 ${ruleName} ホスト: ${username} (${inspectR(result.rating.mu)}) @7~9`,
       components: [createJoinButton()],
     })
   },

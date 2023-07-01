@@ -3,7 +3,7 @@ import assert from 'assert'
 import { CommandHandler } from '../../bot'
 
 import { joinRoom } from '../operations/joinRoom'
-import { inspectRating } from '../inspectors'
+import { inspectR } from '../inspectors'
 import { getUserFromMentionable } from './helpers/mentionable'
 import { createJoinButton, createMatchButton } from './helpers/buttons'
 
@@ -42,7 +42,7 @@ const handler: CommandHandler = {
 
     const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
     const { remainMaxUsersCount } = result
-    const message = `${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
+    const message = `${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
 
     const components = []
     if (remainMinUsersCount === 0) components.push(createMatchButton())

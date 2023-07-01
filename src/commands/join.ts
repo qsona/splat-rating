@@ -2,7 +2,7 @@ import { CommandHandler } from '../../bot'
 import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
-import { inspectRating } from '../inspectors'
+import { inspectR } from '../inspectors'
 import { createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
 import { createRegisterAndJoinModal } from './helpers/modals'
 import { ButtonCommandHandler } from './buttonHandlers'
@@ -36,7 +36,7 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
 
   const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
   const { remainMaxUsersCount } = result
-  const message = `${username} さんがゲームに参加しました。 (${inspectRating(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
+  const message = `${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
 
   const components = []
   if (remainMinUsersCount === 0) components.push(createMatchButton())
