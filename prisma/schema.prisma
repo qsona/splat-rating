@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -19,8 +18,8 @@ model User {
   GameResultRating      GameResultRating[]
   TksTeamUser           TksTeamUser[]
   TksRecruitingRoom     TksRecruitingRoom[]
-  TksRecruitingRoomUser TksRecruitingRoomUser?
   Wiki                  Wiki[]
+  TksRecruitingRoomUser TksRecruitingRoomUser[]
 }
 
 model Room {
@@ -197,10 +196,13 @@ model TksRecruitingRoom {
 
 model TksRecruitingRoomUser {
   id               String            @id @default(cuid())
-  userId           String            @unique
+  userId           String
   user             User              @relation(fields: [userId], references: [id])
   recruitingRoomId String
   recruitingRoom   TksRecruitingRoom @relation(fields: [recruitingRoomId], references: [id], onDelete: Cascade)
+
+  @@unique([recruitingRoomId, userId])
+  @@index([userId])
 }
 
 model TksTeam {
