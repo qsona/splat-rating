@@ -349,12 +349,22 @@ export const tksPartyHandler: CommandHandler = {
   commandName: 'tks-party',
   execute: async (interaction) => {
     const { user, channelId, guildId } = interaction
-    const mentionable2 = interaction.options.getMentionable('user2')!
-    const user2 = getUserFromMentionable(mentionable2)!
-    const mentionable3 = interaction.options.getMentionable('user3')!
-    const user3 = getUserFromMentionable(mentionable3)!
-    const mentionable4 = interaction.options.getMentionable('user4')!
-    const user4 = getUserFromMentionable(mentionable4)!
+    const mentionable2 = interaction.options.getMentionable('user2')
+    const mentionable3 = interaction.options.getMentionable('user3')
+    const mentionable4 = interaction.options.getMentionable('user4')
+    if (!mentionable2 || !mentionable3 || !mentionable4) {
+      await interaction.reply({ content: 'ユーザーが指定されていません。', ephemeral: true })
+      return
+    }
+
+    const user2 = getUserFromMentionable(mentionable2)
+    const user3 = getUserFromMentionable(mentionable3)
+    const user4 = getUserFromMentionable(mentionable4)
+    if (!user2 || !user3 || !user4) {
+      console.log('user2', user2, 'user3', user3, 'user4', user4)
+      await interaction.reply({ content: 'ユーザーが正しく取得できません。' })
+      return
+    }
 
     const users = [user, user2, user3, user4]
     const userIds = users.map((user) => user.id)
