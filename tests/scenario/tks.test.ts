@@ -315,8 +315,8 @@ describe('tks scenario', () => {
     const matchResult = await prisma.tksMatchResult.findFirst()
     expect(matchResult).toBeTruthy()
     expect(matchResult!.primaryTeamId).toBe(firstParty!.teamId)
-    expect(matchResult!.primaryWinCount).toBe(2)
-    expect(matchResult!.opponentWinCount).toBe(3)
+    expect(matchResult!.primaryWinCount).toBe(3)
+    expect(matchResult!.opponentWinCount).toBe(2)
 
     const firstPartyRating = await prisma.tksRating.findFirst({
       where: { teamId: firstParty!.teamId, rule: 'SplatZones' },

@@ -135,12 +135,6 @@ export const tksRecruitHandler: CommandHandler = {
     const { guildId } = interaction
     const { id, username } = interaction.user
 
-    const isAlreadyRecruiting = !!(await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } }))
-    if (isAlreadyRecruiting) {
-      await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
-      return
-    }
-
     const rule: SplatRuleSet = 'SplatZones'
     const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
     if (!rating) {
@@ -158,12 +152,6 @@ export const tksRecruitModalHandler: ModalCommandHandler = {
   customId: 'modal-tks-recruit',
   execute: async (interaction) => {
     const { id, username } = interaction.user
-
-    const isAlreadyRecruiting = await prisma.tksRecruitingRoomUser.findUnique({ where: { userId: id } })
-    if (isAlreadyRecruiting) {
-      await interaction.reply(`${username} はすでに対抗戦味方募集中です。`)
-      return
-    }
 
     const description = interaction.fields.getTextInputValue('description') || null
 
