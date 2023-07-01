@@ -275,10 +275,13 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
 export const tksSetTeamNameButtonHandler: ButtonCommandWithDataHandler = {
   customId: 'button-tks-set-team-name',
   execute: async (interaction, tksTeamId) => {
-    const team = await prisma.tksTeam.findUnique({ where: { id: tksTeamId } })
+    const team = await prisma.tksTeam.findUnique({ where: { id: tksTeamId }, include: { tksTeamUsers: true } })
     if (!team) {
-      await interaction.reply('チームがありません。')
+      await interaction.reply({ content: 'チームがありません。', ephemeral: true })
       return
+    }
+    if (team.tksTeamUsers.every((tu) => tu.userId !== interaction.user.id)) {
+      await interaction.reply({ content: 'チームのメンバーではありません。', ephemeral: true })
     }
     await interaction.showModal(createTksSetTeamNameModal(tksTeamId, team.name != null))
   },
