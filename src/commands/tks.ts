@@ -12,6 +12,7 @@ import { inspectTksTeam } from '../inspectors'
 import { tksCreateParty } from '../operations/tksCreateParty'
 import assertNever from 'assert-never'
 import { createSplatZonesRegisterButton } from './helpers/buttons'
+import { tksReport } from '../operations/tksReport'
 
 const recruitingChannelId = '1043582923644874784'
 const findingOpponentChannelId = '1043583020457807982'
@@ -556,21 +557,6 @@ export const tksReportModalHandler: ModalCommandWithDataHandler = {
   customId: 'modal-tks-report',
   execute: async (interaction, matchId) => {
     const { user } = interaction
-    const match = await prisma.tksMatch.findUnique({
-      where: { id: matchId },
-      include: {
-        primaryTeam: { include: { tksTeamUsers: { include: { user: true } } } },
-        opponentTeam: { include: { tksTeamUsers: { include: { user: true } } } },
-      },
-    })
-    if (!match) {
-      await interaction.reply('対抗戦が存在しません。')
-      return
-    }
-    if (!match.primaryTeam.tksTeamUsers.some((tu) => tu.userId === user.id)) {
-      await interaction.reply('報告はアルファチームのメンバーが行ってください。')
-      return
-    }
 
     const primaryWinCountStr = interaction.fields.getTextInputValue('primaryWinCount')
     const primaryWinCount = Math.trunc(Number(primaryWinCountStr))
@@ -579,38 +565,36 @@ export const tksReportModalHandler: ModalCommandWithDataHandler = {
     const isInterruptedStr = interaction.fields.getTextInputValue('isInterrupted')
     const isInterrupted = isInterruptedStr === '1'
 
-    if (primaryWinCount < 0 || opponentWinCount < 0) {
-      await interaction.reply('勝利数が不正です。')
-      return
-    }
-    if (primaryWinCount > match.winCountOfMatch || opponentWinCount > match.winCountOfMatch) {
-      await interaction.reply(`${match.winCountOfMatch} 本先取の値より大きい勝利数は登録できません。`)
-      return
-    }
-    if (primaryWinCount === match.winCountOfMatch && opponentWinCount === match.winCountOfMatch) {
-      await interaction.reply(`${match.winCountOfMatch} 本先取の値に両チームが到達することはできません。`)
-      return
-    }
-    if (!isInterrupted && primaryWinCount !== match.winCountOfMatch && opponentWinCount !== match.winCountOfMatch) {
-      await interaction.reply(`${match.winCountOfMatch} 本先取の値に両チームとも到達していません。この入力が正しい場合、中断フラグに1を入力してください。`)
-      return
+    const result = await tksReport(user.id, matchId, primaryWinCount, opponentWinCount, isInterrupted)
+
+    if (result.error) {
+      switch (result.error) {
+        case 'MATCH_NOT_FOUND':
+          await interaction.reply('対抗戦が存在しません。')
+          return
+        case 'USER_NOT_IN_PRIMARY_TEAM':
+          await interaction.reply('報告はアルファチームのメンバーが行ってください。')
+          return
+        case 'INVALID_WIN_COUNT':
+          await interaction.reply('勝利数が不正です。')
+          return
+        case 'WIN_COUNT_GREATER_THAN_WIN_COUNT_OF_MATCH':
+          await interaction.reply(`${result.match.winCountOfMatch} 本先取の値より大きい勝利数は登録できません。`)
+          return
+        case 'BOTH_WIN_COUNT_ARE_WIN_COUNT_OF_MATCH':
+          await interaction.reply(`${result.match.winCountOfMatch} 本先取の値に両チームが到達することはできません。`)
+          return
+        case 'BOTH_WIN_COUNT_ARE_NOT_WIN_COUNT_OF_MATCH':
+          await interaction.reply(
+            `${result.match.winCountOfMatch} 本先取の値に両チームとも到達していません。この入力が正しい場合、中断フラグに1を入力してください。`
+          )
+          return
+        default:
+          assertNever(result)
+      }
     }
 
-    const { primaryTeamId, opponentTeamId, winCountOfMatch, rule } = match
-    await prisma.$transaction(async (prisma) => {
-      await prisma.tksMatch.delete({ where: { id: matchId } })
-      await prisma.tksMatchResult.create({
-        data: {
-          primaryTeamId,
-          opponentTeamId,
-          winCountOfMatch,
-          primaryWinCount,
-          opponentWinCount,
-          matchStartedAt: match.createdAt,
-          rule,
-        },
-      })
-    })
+    const { deletedMatch: match } = result
     const { primaryTeam, opponentTeam } = match
     const messages = [
       `アルファ: [チーム名: ${primaryTeam.name || '(未定)'}] ${primaryTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
@@ -618,6 +602,9 @@ export const tksReportModalHandler: ModalCommandWithDataHandler = {
       '',
       `結果: アルファ ${primaryWinCount} - ${opponentWinCount} ブラボー 💡`,
     ]
+    if (isInterrupted) {
+      messages.push('中断')
+    }
     interaction.reply({ content: messages.join('\n') })
   },
 }
