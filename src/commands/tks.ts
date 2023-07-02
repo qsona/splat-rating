@@ -468,8 +468,9 @@ export const tksFindOpponentModalHandler: ModalCommandWithDataHandler = {
     })
 
     const { team } = party
-    const teamNameMessage = team.name ? `チーム名: ${team.name}` : `メンバー: ${team.tksTeamUsers.map((u) => u.user.name).join(' ')}`
-    const messages = ['対抗戦相手募集', teamNameMessage, `ルール: ${getRuleName(rule)} ${winCountOfMatch}本先取`, description || '']
+    const teamRating = await prisma.tksRating.findUniqueOrThrow({ where: { teamId_rule: { teamId: team.id, rule } } })
+    const teamNameMessage = `${inspectTksTeam(team, teamRating)} ${team.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`
+    const messages = ['対抗戦相手募集', teamNameMessage, `ルール: ${getRuleName(rule)} ${winCountOfMatch}本先取 ステージおまかせロスト`, description || '']
     await interaction.reply({ content: messages.join('\n'), components: [createTksMatchButton(partyId)] })
     return
   },
@@ -520,10 +521,13 @@ export const tksMatchButtonHandler: ButtonCommandWithDataHandler = {
     })
     const alphaTeam = targetParty.team
     const bravoTeam = myParty.team
+    const alphaTeamRating = await prisma.tksRating.findUniqueOrThrow({ where: { teamId_rule: { teamId: alphaTeam.id, rule } } })
+    const bravoTeamRating = await prisma.tksRating.findUniqueOrThrow({ where: { teamId_rule: { teamId: bravoTeam.id, rule } } })
+
     const messages = [
       '対抗戦開始 🚀',
-      `アルファ: [チーム名: ${alphaTeam.name || '(未定)'}] ${alphaTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
-      `ブラボー: [チーム名: ${bravoTeam.name || '(未定)'}] ${bravoTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
+      `アルファ: ${inspectTksTeam(alphaTeam, alphaTeamRating)} ${alphaTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
+      `ブラボー: ${inspectTksTeam(bravoTeam, bravoTeamRating)} ${bravoTeam.tksTeamUsers.map((tu) => tu.user.name).join(' ')}`,
       '',
       '結果報告はアルファチームが行ってください 💪',
     ]

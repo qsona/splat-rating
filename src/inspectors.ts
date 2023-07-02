@@ -1,4 +1,4 @@
-import { TksRating, TksTeam } from '@prisma/client'
+import { TksRating, TksTeam, TksTeamUser } from '@prisma/client'
 import { sumBy } from 'lodash'
 import { tksTeamRatingInfo } from './models/TksTeam'
 

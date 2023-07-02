@@ -29,15 +29,15 @@ exports[`tks scenario tks scenario 4`] = `
 
 exports[`tks scenario tks scenario 5`] = `
 "対抗戦相手募集
-メンバー: username1 username2 username3 username4
-ルール: ガチエリア 3本先取
+[計測中...0/5] (推定R2000) | (チーム名未設定) username1 username2 username3 username4
+ルール: ガチエリア 3本先取 ステージおまかせロスト
 3"
 `;
 
 exports[`tks scenario tks scenario 6`] = `
 "対抗戦開始 🚀
-アルファ: [チーム名: (未定)] username1 username2 username3 username4
-ブラボー: [チーム名: (未定)] username5 username6 username7 username8
+アルファ: [計測中...0/5] (推定R2000) | (チーム名未設定) username1 username2 username3 username4
+ブラボー: [計測中...0/5] (推定R2000) | (チーム名未設定) username5 username6 username7 username8
 
 結果報告はアルファチームが行ってください 💪"
 `;
