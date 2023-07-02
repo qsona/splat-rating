@@ -8,7 +8,7 @@ import { getUserFromMentionable } from './helpers/mentionable'
 import { uniq } from 'lodash'
 import { SplatRuleSet, getRuleName } from '../rules'
 import { calcTeamId } from '../models/TksTeam'
-import { inspectTksTeam } from '../inspectors'
+import { inspectR, inspectTksTeam } from '../inspectors'
 import { tksCreateParty } from '../operations/tksCreateParty'
 import assertNever from 'assert-never'
 import { createSplatZonesRegisterButton } from './helpers/buttons'
@@ -152,7 +152,17 @@ export const tksRecruitHandler: CommandHandler = {
 export const tksRecruitModalHandler: ModalCommandHandler = {
   customId: 'modal-tks-recruit',
   execute: async (interaction) => {
+    const { guildId } = interaction
     const { id, username } = interaction.user
+
+    const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
+    if (!rating) {
+      await interaction.reply({
+        content: `${username} のレーティングが未登録です。下のボタンを押して登録してから、再度参加してください。`,
+        components: [createSplatZonesRegisterButton()],
+      })
+      return
+    }
 
     const description = interaction.fields.getTextInputValue('description') || null
 
@@ -168,7 +178,7 @@ export const tksRecruitModalHandler: ModalCommandHandler = {
       return { tksRecruitingRoom }
     })
     // const messages = ['@everyone', `${username}: 対抗戦味方募集@3`]
-    const messages = [`${username}: 対抗戦味方募集@3`]
+    const messages = [`対抗戦味方募集@3 ${username} (${inspectR(rating.mu)})`]
     if (description) messages.push(description)
     await interaction.reply({
       content: messages.join('\n'),
@@ -201,6 +211,7 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
         content: `${username} のレーティングが未登録です。下のボタンを押して登録してから、再度参加してください。`,
         components: [createSplatZonesRegisterButton()],
       })
+      return
     }
 
     const users = room.recruitingRoomUsers.map((ru) => ru.user)
@@ -210,7 +221,7 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
 
     if (users.length < 3) {
       await prisma.tksRecruitingRoomUser.create({ data: { recruitingRoomId: room.id, userId: id } })
-      const messages = [`${username} が参加しました。`, `@everyone 対抗戦味方募集@${3 - users.length}`]
+      const messages = [`${username} (${inspectR(rating.mu)}) が参加しました。`, `@everyone 対抗戦味方募集@${3 - users.length}`]
       if (room.description) messages.push(room.description)
       await interaction.reply({
         content: messages.join('\n'),

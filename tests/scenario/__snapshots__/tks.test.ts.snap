@@ -9,11 +9,17 @@ exports[`tks scenario tks scenario 1`] = `
 `;
 
 exports[`tks scenario tks scenario 2`] = `
-"username5: 対抗戦味方募集@3
+"対抗戦味方募集@3 username5 (R2400)
 description 1"
 `;
 
 exports[`tks scenario tks scenario 3`] = `
+"username6 (R2000) が参加しました。
+@everyone 対抗戦味方募集@2
+description 1"
+`;
+
+exports[`tks scenario tks scenario 4`] = `
 {
   "content": "username8 が参加しました。
 対抗戦味方募集@うまり
@@ -22,19 +28,19 @@ exports[`tks scenario tks scenario 3`] = `
 }
 `;
 
-exports[`tks scenario tks scenario 4`] = `
+exports[`tks scenario tks scenario 5`] = `
 "username5 username6 username7 username8 がパーティーを結成したぞ!
 [計測中...0/5] (推定R2000) | (チーム名未設定)"
 `;
 
-exports[`tks scenario tks scenario 5`] = `
+exports[`tks scenario tks scenario 6`] = `
 "対抗戦相手募集
 [計測中...0/5] (推定R2000) | (チーム名未設定) username1 username2 username3 username4
 ルール: ガチエリア 3本先取 ステージおまかせロスト
 3"
 `;
 
-exports[`tks scenario tks scenario 6`] = `
+exports[`tks scenario tks scenario 7`] = `
 "対抗戦開始 🚀
 アルファ: [計測中...0/5] (推定R2000) | (チーム名未設定) username1 username2 username3 username4
 ブラボー: [計測中...0/5] (推定R2000) | (チーム名未設定) username5 username6 username7 username8
@@ -42,7 +48,7 @@ exports[`tks scenario tks scenario 6`] = `
 結果報告はアルファチームが行ってください 💪"
 `;
 
-exports[`tks scenario tks scenario 7`] = `
+exports[`tks scenario tks scenario 8`] = `
 "結果: アルファ 3 - 2 ブラボー 💡
 
 アルファ: [計測中...1/5] (推定R2034) | (チーム名未設定)

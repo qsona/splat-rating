@@ -143,6 +143,7 @@ describe('tks scenario', () => {
         },
         {
           onReply: async (options) => {
+            expect(options.content).toMatchSnapshot()
             expect(options.components).toHaveLength(2)
             expect(getCustomId(options.components![0])).toBe(`button-tks-room-join@${recruitingRoom!.id}`)
             expect(getCustomId(options.components![1])).toBe(`button-tks-leave-room@${recruitingRoom!.id}`)
