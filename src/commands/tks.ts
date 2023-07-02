@@ -17,6 +17,8 @@ import { tksReport } from '../operations/tksReport'
 const recruitingChannelId = '1043582923644874784'
 const findingOpponentChannelId = '1124749344655036426'
 
+const rule: SplatRuleSet = 'SplatZones'
+
 // button and modals
 
 export const createTksRecruitModal = () => {
@@ -135,7 +137,6 @@ export const tksRecruitHandler: CommandHandler = {
     const { guildId } = interaction
     const { id, username } = interaction.user
 
-    const rule: SplatRuleSet = 'SplatZones'
     const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
     if (!rating) {
       await interaction.reply({
@@ -194,11 +195,10 @@ export const tksRoomJoinButtonHandler: ButtonCommandWithDataHandler = {
       return
     }
 
-    const rule: SplatRuleSet = 'SplatZones'
     const rating = await prisma.rating.findUnique({ where: { userId_guildId_rule: { userId: id, guildId: guildId!, rule } } })
     if (!rating) {
       await interaction.reply({
-        content: `${username} のレーティングが未登録です。下のボタンを押して登録してください。`,
+        content: `${username} のレーティングが未登録です。下のボタンを押して登録してから、再度参加してください。`,
         components: [createSplatZonesRegisterButton()],
       })
     }
@@ -457,7 +457,6 @@ export const tksFindOpponentModalHandler: ModalCommandWithDataHandler = {
     // }
     const winCountOfMatch = 3
     const description = interaction.fields.getTextInputValue('description') || null
-    const rule: SplatRuleSet = 'SplatZones'
     await prisma.tksFindingOpponent.create({
       data: {
         partyId,
