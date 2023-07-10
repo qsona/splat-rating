@@ -42,7 +42,7 @@
     "@types/object-hash": "^2.2.1",
     "@types/passport": "^1.0.7",
     "@types/passport-discord": "^0.1.6",
-    "discord-api-types": "^0.36.3",
+    "discord-api-types": "^0.37.48",
     "dotenv": "*",
     "dotenv-cli": "*",
     "prettier": "^2.5.1",
