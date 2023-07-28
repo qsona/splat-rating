@@ -66,8 +66,8 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
       }
       const gachipowerStr = interaction.fields.getTextInputValue('gachipowerInput')
       const gachipower = Math.trunc(Number(gachipowerStr)) || 0
-      if (gachipower < 600 || 3200 < gachipower) {
-        await interaction.reply('gachipower には 600 から 3200 までの値を入力してください')
+      if (gachipower < 600 || 4100 < gachipower) {
+        await interaction.reply('gachipower には 600 から 4100 までの値を入力してください')
         return
       }
       const rulename = getRuleName(rule)
@@ -133,8 +133,8 @@ const createRegisterModalHandler = (rule: SplatRuleSet): ModalCommandHandler => 
       }
       const gachipowerStr = interaction.fields.getTextInputValue('gachipowerInput')
       const gachipower = Math.trunc(Number(gachipowerStr)) || 0
-      if (gachipower < 600 || 3200 < gachipower) {
-        await interaction.reply('gachipower には 600 から 3200 までの値を入力してください')
+      if (gachipower < 600 || 4100 < gachipower) {
+        await interaction.reply('gachipower には 600 から 4100 までの値を入力してください')
         return
       }
       const rulename = getRuleName(rule)

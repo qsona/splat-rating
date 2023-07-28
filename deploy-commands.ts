@@ -24,7 +24,7 @@ const commands = [
         .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
         .setRequired(true)
     )
-    .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
+    .addNumberOption((option) => option.setName('gachipower').setMaxValue(4100).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
     .setDescription('レーティング登録'),
   new SlashCommandBuilder()
     .setName('sr-newgame')
@@ -61,7 +61,7 @@ const commands = [
   //       .addChoices(...SPLAT_RULES_NAME_MAP.map(({ code, name }) => ({ name, value: code })))
   //       .setRequired(true)
   //   )
-  //   .addNumberOption((option) => option.setName('gachipower').setMaxValue(3200).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
+  //   .addNumberOption((option) => option.setName('gachipower').setMaxValue(4100).setMinValue(600).setRequired(true).setDescription('推定ガチパワー'))
   //   .setDescription('他ユーザーをレーティング登録させる'),
   // new SlashCommandBuilder()
   //   .setName('sr-make-join')
