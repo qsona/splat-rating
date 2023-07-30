@@ -32,11 +32,6 @@ exports[`room scenario room scenario 2`] = `
           "style": 1,
           "type": 2,
         },
-      ],
-      "type": 1,
-    },
-    {
-      "components": [
         {
           "custom_id": "button-leave",
           "emoji": undefined,
@@ -84,11 +79,6 @@ exports[`room scenario room scenario 4`] = `
           "style": 1,
           "type": 2,
         },
-      ],
-      "type": 1,
-    },
-    {
-      "components": [
         {
           "custom_id": "button-leave",
           "emoji": undefined,

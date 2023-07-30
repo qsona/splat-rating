@@ -3,7 +3,7 @@ import { CommandHandler } from '../../bot'
 import { prisma } from '../prismaClient'
 import { createMatching } from '../operations/createMatching'
 import { inspectTeamUsers } from '../inspectors'
-import { createWinButton, createLoseButton, createCancelButton } from './helpers/buttons'
+import { createRow, createWinButton, createLoseButton, createCancelButton } from './helpers/buttons'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
 import { ButtonCommandHandler } from './buttonHandlers'
 
@@ -32,7 +32,7 @@ const matchExecute = async (interaction: ButtonInteraction | ChatInputCommandInt
     const usernames = (await prisma.user.findMany({ where: { id: { in: watchingUserIds } }, select: { name: true } })).map((u) => u.name)
     messages.push(`観戦: ${usernames.join(' ')}`)
   }
-  await interaction.reply({ content: messages.join('\n'), components: [createWinButton(), createLoseButton(), createCancelButton()] })
+  await interaction.reply({ content: messages.join('\n'), components: [createRow(createWinButton(), createLoseButton(), createCancelButton())] })
 }
 
 const handler: CommandHandler = {

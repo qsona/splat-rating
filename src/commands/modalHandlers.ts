@@ -4,7 +4,7 @@ import { registerUserAndRating } from '../operations/registerUserAndRating'
 import { joinRoom } from '../operations/joinRoom'
 import { SplatRuleSet, getRuleName, SPLAT_RULES_NAME_MAP } from '../rules'
 import { inspectR } from '../inspectors'
-import { createJoinButton, createMatchButton } from './helpers/buttons'
+import { createRow, createJoinButton, createMatchButton, createLeaveButton } from './helpers/buttons'
 import { tksRecruitModalHandler, tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler } from './tks'
 
 export type ModalCommandHandler = {
@@ -113,8 +113,13 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
       messages.push(`${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`)
 
       const components = []
-      if (remainMinUsersCount === 0) components.push(createMatchButton())
-      if (remainMaxUsersCount !== 0) components.push(createJoinButton())
+
+      if (remainMinUsersCount === 0) components.push(createRow(createMatchButton()))
+
+      const userButtons = []
+      if (remainMaxUsersCount !== 0) userButtons.push(createJoinButton())
+      userButtons.push(createLeaveButton())
+      components.push(createRow(...userButtons))
 
       await interaction.reply({ content: messages.join('\n'), components })
     },
