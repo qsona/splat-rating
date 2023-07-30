@@ -66,9 +66,9 @@ describe('room scenario', () => {
           },
         },
         async (options) => {
-          expect(options.components).toHaveLength(2)
-          expect(getCustomId(options.components![0])).toBe('button-join')
-          expect(getCustomId(options.components![1])).toBe('button-leave')
+          expect(options.components).toHaveLength(1)
+          expect(getCustomId(options.components![0], 0)).toBe('button-join')
+          expect(getCustomId(options.components![0], 1)).toBe('button-leave')
 
           expect(options).toMatchSnapshot()
         }
@@ -107,9 +107,9 @@ describe('room scenario', () => {
             },
           },
           async (options) => {
-            expect(options.components).toHaveLength(2)
-            expect(getCustomId(options.components![0])).toBe('button-join')
-            expect(getCustomId(options.components![1])).toBe('button-leave')
+            expect(options.components).toHaveLength(1)
+            expect(getCustomId(options.components![0], 0)).toBe('button-join')
+            expect(getCustomId(options.components![0], 1)).toBe('button-leave')
           }
         )
       )
@@ -127,10 +127,10 @@ describe('room scenario', () => {
           },
         },
         async (options) => {
-          expect(options.components).toHaveLength(3)
-          expect(getCustomId(options.components![0])).toBe('button-match')
-          expect(getCustomId(options.components![1])).toBe('button-join')
-          expect(getCustomId(options.components![2])).toBe('button-leave')
+          expect(options.components).toHaveLength(2)
+          expect(getCustomId(options.components![0], 0)).toBe('button-match')
+          expect(getCustomId(options.components![1], 0)).toBe('button-join')
+          expect(getCustomId(options.components![1], 1)).toBe('button-leave')
           expect(options).toMatchSnapshot()
         }
       )
@@ -170,10 +170,10 @@ describe('room scenario', () => {
           },
         },
         async (options) => {
-          expect(options.components).toHaveLength(3)
+          expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-match')
-          expect(getCustomId(options.components![1])).toBe('button-join')
-          expect(getCustomId(options.components![2])).toBe('button-leave')
+          expect(getCustomId(options.components![1], 0)).toBe('button-join')
+          expect(getCustomId(options.components![1], 1)).toBe('button-leave')
         }
       )
     )
@@ -191,10 +191,10 @@ describe('room scenario', () => {
           },
         },
         async (options) => {
-          expect(options.components).toHaveLength(3)
+          expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-match')
-          expect(getCustomId(options.components![1])).toBe('button-join')
-          expect(getCustomId(options.components![2])).toBe('button-leave')
+          expect(getCustomId(options.components![1], 0)).toBe('button-join')
+          expect(getCustomId(options.components![1], 1)).toBe('button-leave')
         }
       )
     )
@@ -213,7 +213,7 @@ describe('room scenario', () => {
         async (options) => {
           expect(options.components).toHaveLength(2)
           expect(getCustomId(options.components![0])).toBe('button-match')
-          expect(getCustomId(options.components![1])).toBe('button-leave')
+          expect(getCustomId(options.components![1], 0)).toBe('button-leave')
           expect(options).toMatchSnapshot()
         }
       )

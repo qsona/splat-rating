@@ -3,7 +3,7 @@ import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectR } from '../inspectors'
-import { createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
+import { createRow, createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
 import { createRegisterAndJoinModal } from './helpers/modals'
 import { ButtonCommandHandler } from './buttonHandlers'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
@@ -39,9 +39,13 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
   const message = `${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
 
   const components = []
-  if (remainMinUsersCount === 0) components.push(createMatchButton())
-  if (remainMaxUsersCount !== 0) components.push(createJoinButton())
-  components.push(createLeaveButton())
+
+  if (remainMinUsersCount === 0) components.push(createRow(createMatchButton()))
+
+  const userButtons = []
+  if (remainMaxUsersCount !== 0) userButtons.push(createJoinButton())
+  userButtons.push(createLeaveButton())
+  components.push(createRow(...userButtons))
 
   await interaction.reply({ content: message, components })
 }

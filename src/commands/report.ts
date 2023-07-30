@@ -4,7 +4,7 @@ import { CommandHandler } from '../../bot'
 import { inspectR } from '../inspectors'
 import { reportMatching, RatingResult } from '../operations/reportMatching'
 import { cancelMatching } from '../operations/cancelMatching'
-import { createMatchButton } from './helpers/buttons'
+import { createRow, createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
 import { ButtonCommandHandler } from './buttonHandlers'
 
@@ -69,7 +69,13 @@ const reportExecute = async (result: 'win' | 'lose' | 'cancel', interaction: But
   }
   const messages = [`Winners: ${inspectTeamUsers(winnerTeamsRatings)}`, `Losers: ${inspectTeamUsers(loserTeamsRatings)}`]
 
-  await interaction.reply({ content: messages.join('\n'), components: [createMatchButton()] })
+  const components = [createRow(createMatchButton())]
+
+  // TODO: do not show join button when remainMaxUsersCount is 0
+  const userButtons = [createJoinButton(), createLeaveButton()]
+  components.push(createRow(...userButtons))
+
+  await interaction.reply({ content: messages.join('\n'), components })
 }
 
 const handler: CommandHandler = {

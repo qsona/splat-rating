@@ -1,6 +1,6 @@
 import { InteractionReplyOptions, InteractionType } from 'discord.js'
 
-export const getCustomId = (component: any) => component?.toJSON().components?.[0]?.custom_id
+export const getCustomId = (component: any, index: number | undefined = 0) => component?.toJSON().components?.[index]?.custom_id
 export const getCustomIdWithoutData = (component: any) => {
   const customId = getCustomId(component)
   return customId.match(/^(.+)@/)[1]
