@@ -4,7 +4,7 @@ import { ButtonCommandHandler } from './buttonHandlers'
 import { ModalCommandHandler } from './modalHandlers'
 
 export const updateUsernameButtonHandler: ButtonCommandHandler = {
-  customId: 'update-username',
+  customId: 'button-update-username',
   execute: async (interaction) => {
     const user = await prisma.user.findUnique({ where: { id: interaction.user.id } })
     if (!user) {
@@ -27,7 +27,7 @@ export const createUpdateUsernameModal = () => {
 }
 
 export const updateUsernameModalHandler: ModalCommandHandler = {
-  customId: 'update-username',
+  customId: 'modal-update-username',
   execute: async (interaction) => {
     const user = await prisma.user.findUnique({ where: { id: interaction.user.id } })
     if (!user) {
