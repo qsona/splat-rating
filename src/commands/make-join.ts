@@ -5,7 +5,7 @@ import { CommandHandler } from '../../bot'
 import { joinRoom } from '../operations/joinRoom'
 import { inspectR } from '../inspectors'
 import { getUserFromMentionable } from './helpers/mentionable'
-import { createRow, createJoinButton, createMatchButton, createLeaveButton } from './helpers/buttons'
+import { createRow, createJoinButton, createMatchButton, createLeaveButton, createUpdateUsernameButton } from './helpers/buttons'
 
 const handler: CommandHandler = {
   commandName: 'sr-make-join',
@@ -50,7 +50,7 @@ const handler: CommandHandler = {
 
     const userButtons = []
     if (remainMaxUsersCount !== 0) userButtons.push(createJoinButton())
-    userButtons.push(createLeaveButton())
+    userButtons.push(createLeaveButton(), createUpdateUsernameButton())
     components.push(createRow(...userButtons))
 
     await interaction.reply({ content: message, components })

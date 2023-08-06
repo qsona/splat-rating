@@ -39,11 +39,18 @@ exports[`room scenario room scenario 2`] = `
           "style": 2,
           "type": 2,
         },
+        {
+          "custom_id": "button-update-username",
+          "emoji": undefined,
+          "label": "ユーザ名変更",
+          "style": 2,
+          "type": 2,
+        },
       ],
       "type": 1,
     },
   ],
-  "content": "username2 さんがゲームに参加しました。 (R2100)
+  "content": "username2 (username2) さんがゲームに参加しました。 (R2100)
 @6~8",
 }
 `;
@@ -86,11 +93,18 @@ exports[`room scenario room scenario 4`] = `
           "style": 2,
           "type": 2,
         },
+        {
+          "custom_id": "button-update-username",
+          "emoji": undefined,
+          "label": "ユーザ名変更",
+          "style": 2,
+          "type": 2,
+        },
       ],
       "type": 1,
     },
   ],
-  "content": "username8 さんがゲームに参加しました。 (R2700)
+  "content": "username8 (username8) さんがゲームに参加しました。 (R2700)
 @0~2",
 }
 `;
@@ -126,11 +140,18 @@ exports[`room scenario room scenario 6`] = `
           "style": 2,
           "type": 2,
         },
+        {
+          "custom_id": "button-update-username",
+          "emoji": undefined,
+          "label": "ユーザ名変更",
+          "style": 2,
+          "type": 2,
+        },
       ],
       "type": 1,
     },
   ],
-  "content": "username10 さんがゲームに参加しました。 (R2900)
+  "content": "username10 (username10) さんがゲームに参加しました。 (R2900)
 @0~0",
 }
 `;

@@ -4,6 +4,7 @@ import { leaveButtonHandler } from './leave'
 import { reportWinButtonHandler, reportLoseButtonHandler, reportCancelButtonHandler } from './report'
 import { matchButtonHandler } from './match'
 import { splatZonesRegisterButtonHandler } from './register'
+import { updateUsernameButtonHandler } from './updateUsername'
 
 import {
   tksRoomJoinButtonHandler,
@@ -78,6 +79,7 @@ const jumpHandler: ButtonCommandHandler = {
   reportCancelButtonHandler,
   matchButtonHandler,
   splatZonesRegisterButtonHandler,
+  updateUsernameButtonHandler,
   dashHandler,
   jumpHandler,
 ].forEach((handler) => handlers.set(handler.customId, handler))
