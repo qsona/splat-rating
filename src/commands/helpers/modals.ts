@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ModalBuilder, TextInputBuilder, SelectMenuBuilder, TextInputStyle } from 'discord.js'
+import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js'
 import { SplatRuleSet, getRuleName } from '../../rules'
 
 export const createRegisterAndJoinModal = (rule: SplatRuleSet) => {

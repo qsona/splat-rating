@@ -3,11 +3,12 @@ import assert from 'assert'
 
 import { joinRoom } from '../operations/joinRoom'
 import { inspectR } from '../inspectors'
-import { createRow, createMatchButton, createJoinButton, createLeaveButton } from './helpers/buttons'
+import { createRow, createMatchButton, createJoinButton, createLeaveButton, createUpdateUsernameButton } from './helpers/buttons'
 import { createRegisterAndJoinModal } from './helpers/modals'
 import { ButtonCommandHandler } from './buttonHandlers'
 import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js'
 import { SplatRuleSet } from '../rules'
+import { prisma } from '../prismaClient'
 
 const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInteraction) => {
   const { channelId, guildId } = interaction
@@ -34,9 +35,11 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
     return
   }
 
+  const user = await prisma.user.findUnique({ where: { id } })
+  assert(user)
   const remainMinUsersCount = Math.max(result.remainMinUsersCount, 0)
   const { remainMaxUsersCount } = result
-  const message = `${username} さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
+  const message = `${user.name} (${username}) さんがゲームに参加しました。 (${inspectR(result.rating.mu)})\n@${remainMinUsersCount}~${remainMaxUsersCount}`
 
   const components = []
 
@@ -44,7 +47,7 @@ const joinExecute = async (interaction: ButtonInteraction | ChatInputCommandInte
 
   const userButtons = []
   if (remainMaxUsersCount !== 0) userButtons.push(createJoinButton())
-  userButtons.push(createLeaveButton())
+  userButtons.push(createLeaveButton(), createUpdateUsernameButton())
   components.push(createRow(...userButtons))
 
   await interaction.reply({ content: message, components })

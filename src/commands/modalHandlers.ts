@@ -4,7 +4,8 @@ import { registerUserAndRating } from '../operations/registerUserAndRating'
 import { joinRoom } from '../operations/joinRoom'
 import { SplatRuleSet, getRuleName, SPLAT_RULES_NAME_MAP } from '../rules'
 import { inspectR } from '../inspectors'
-import { createRow, createJoinButton, createMatchButton, createLeaveButton } from './helpers/buttons'
+import { createRow, createJoinButton, createMatchButton, createLeaveButton, createUpdateUsernameButton } from './helpers/buttons'
+import { updateUsernameModalHandler } from './updateUsername'
 import { tksRecruitModalHandler, tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler } from './tks'
 
 export type ModalCommandHandler = {
@@ -118,7 +119,7 @@ const createRegisterAndJoinModalHandler = (rule: SplatRuleSet): ModalCommandHand
 
       const userButtons = []
       if (remainMaxUsersCount !== 0) userButtons.push(createJoinButton())
-      userButtons.push(createLeaveButton())
+      userButtons.push(createLeaveButton(), createUpdateUsernameButton())
       components.push(createRow(...userButtons))
 
       await interaction.reply({ content: messages.join('\n'), components })
@@ -168,5 +169,7 @@ const createRegisterModalHandler = (rule: SplatRuleSet): ModalCommandHandler => 
 
 const registerAndJoinModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterAndJoinModalHandler(code))
 const registerModalHandlers = SPLAT_RULES_NAME_MAP.map(({ code }) => createRegisterModalHandler(code))
-;[...registerAndJoinModalHandlers, ...registerModalHandlers, dashHandler, tksRecruitModalHandler].forEach((handler) => handlers.set(handler.customId, handler))
+;[...registerAndJoinModalHandlers, ...registerModalHandlers, updateUsernameModalHandler, dashHandler, tksRecruitModalHandler].forEach((handler) =>
+  handlers.set(handler.customId, handler)
+)
 ;[tksSetTeamNameModalHandler, tksFindOpponentModalHandler, tksReportModalHandler].forEach((handler) => withDataHandlers.set(handler.customId, handler))

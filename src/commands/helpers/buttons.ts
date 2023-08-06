@@ -33,3 +33,7 @@ export const createSplatZonesRegisterButton = () => {
     new ButtonBuilder().setCustomId('button-splat-zones-register').setLabel('レーティング登録').setStyle(ButtonStyle.Secondary)
   )
 }
+
+export const createUpdateUsernameButton = () => {
+  return new ButtonBuilder().setCustomId('button-update-username').setLabel('ユーザ名変更').setStyle(ButtonStyle.Secondary)
+}
