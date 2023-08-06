@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.1.0",
-    "@quixo3/prisma-session-store": "^3.1.8",
+    "@quixo3/prisma-session-store": "^3.1.13",
     "aigle": "^1.14.1",
     "assert-never": "^1.2.1",
     "discord.js": "^14.6.0",
