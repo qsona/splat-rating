@@ -3,6 +3,7 @@ import { rate } from 'openskill'
 import { prisma } from '../prismaClient'
 
 const BETA = 200
+const MINIMUM_SIGMA = 120
 
 export type RatingResult = {
   ratingId: string
@@ -53,6 +54,7 @@ export const reportMatching = async (userId: string, discordChannelId: string, i
       const isWinner = teamIndex === 0
       return await Aigle.map(teamRatings, async (rating, ratingIndex) => {
         const newRating = newTeamsRatings[teamIndex][ratingIndex]
+        newRating.sigma = Math.max(newRating.sigma, MINIMUM_SIGMA)
         const updateData = {
           mu: newRating.mu,
           sigma: newRating.sigma,
