@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">= 22.7"
   },
   "author": "qsona",
   "license": "MIT",
