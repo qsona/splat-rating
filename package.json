@@ -7,6 +7,7 @@
     "start": "npm run bot && npm run app-healthcheck",
     "app": "ts-node ./app.ts",
     "app-healthcheck": "ts-node ./app-healthcheck.ts",
+    "build": "prisma generate && prisma migrate deploy",
     "bot": "ts-node ./bot.ts",
     "predeploy": "prisma migrate deploy",
     "repl": "ts-node ./repl.ts",
