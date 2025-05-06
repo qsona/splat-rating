@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./app.ts",
+    "start": "npm run bot && npm run app-healthcheck",
+    "app": "ts-node ./app.ts",
+    "app-healthcheck": "ts-node ./app-healthcheck.ts",
     "bot": "ts-node ./bot.ts",
     "predeploy": "prisma migrate deploy",
     "repl": "ts-node ./repl.ts",
